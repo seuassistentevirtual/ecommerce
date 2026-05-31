@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CommerceHub — Gestão de E-commerce</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --brand:#e8521a;--brand-light:#fff1ec;--brand-mid:#f06d3a;
+  --dark:#0f0f0f;--surface:#fff;--surface2:#fafaf9;--surface3:#f5f4f0;
+  --border:#e8e4de;--border2:#f0ede8;
+  --text:#1a1a1a;--text2:#555;--text3:#999;
+  --success:#2d7a1f;--success-bg:#eaf4e5;
+  --warn:#8a5a00;--warn-bg:#fff8e6;
+  --danger:#c0392b;--danger-bg:#fdecea;
+  --info:#1a5fa8;--info-bg:#e8f0fb;
+  --radius:10px;--font:'Sora',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+}
+body{font-family:var(--font);background:var(--surface3);color:var(--text);font-size:13px}
+.app{display:flex;height:100vh}
+.sidebar{width:218px;background:var(--dark);color:#fff;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:3px}.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.sidebar-logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.07)}
+.logo-mark{font-size:16px;font-weight:700;color:#fff}.logo-mark span{color:var(--brand)}
+.logo-sub{font-size:9px;opacity:.4;margin-top:2px;letter-spacing:.8px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;margin:1px 6px;border-radius:8px;cursor:pointer;font-size:12px;color:rgba(255,255,255,.6);transition:all .15s;user-select:none}
+.nav-item i.icon{font-size:14px;width:16px;text-align:center;flex-shrink:0}
+.nav-item span.lbl{flex:1}
+.nav-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-item.active{background:var(--brand);color:#fff;font-weight:500}
+.notif-dot{background:var(--brand);color:#fff;border-radius:10px;font-size:9px;padding:1px 5px;font-weight:700;flex-shrink:0}
+.nav-item.active .notif-dot{background:rgba(255,255,255,.3)}
+.sector-hdr{padding:14px 16px 4px;font-size:9px;font-weight:700;letter-spacing:1.2px;opacity:.3;text-transform:uppercase}
+.nav-divider{height:.5px;background:rgba(255,255,255,.07);margin:6px 10px}
+.sidebar-footer{margin-top:auto;padding:12px 10px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.user-role-badge{font-size:9px;padding:1px 6px;border-radius:8px;background:rgba(232,82,26,.25);color:var(--brand);font-weight:600;display:inline-flex;margin-top:2px}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.topbar-left{flex:1;display:flex;align-items:center;gap:10px}
+.page-title{font-size:15px;font-weight:600}
+.search-box{display:flex;align-items:center;gap:7px;background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:6px 11px;width:210px}
+.search-box input{background:none;border:none;outline:none;font-size:12px;font-family:var(--font);width:100%}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);font-family:var(--font);transition:all .15s;white-space:nowrap}
+.btn:hover{background:var(--surface3)}
+.btn-primary{background:var(--brand);color:#fff;border-color:var(--brand)}.btn-primary:hover{background:#c94114}
+.btn-danger{background:var(--danger-bg);color:var(--danger);border-color:#f5b8b5}
+.btn-success{background:var(--success-bg);color:var(--success);border-color:#b3dfab}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-ghost{background:transparent;border:none;color:var(--text3);padding:5px 7px}.btn-ghost:hover{background:var(--surface3);color:var(--text)}
+.btn-outline{background:transparent;color:var(--brand);border-color:var(--brand)}.btn-outline:hover{background:var(--brand-light)}
+.content{flex:1;overflow-y:auto;padding:20px}
+.content::-webkit-scrollbar{width:5px}.content::-webkit-scrollbar-thumb{background:#ddd;border-radius:3px}
+.page{display:none}.page.active{display:block}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.kpi-label{font-size:11px;color:var(--text3);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.kpi-value{font-size:24px;font-weight:600;letter-spacing:-.5px}
+.kpi-sub{font-size:10px;color:var(--text3);margin-top:3px}
+.kpi-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:2px 7px;border-radius:8px;margin-top:4px;font-weight:500}
+.bg{background:var(--success-bg);color:var(--success)}.ba{background:var(--warn-bg);color:var(--warn)}.br{background:var(--danger-bg);color:var(--danger)}.bb{background:var(--info-bg);color:var(--info)}.bp{background:var(--brand-light);color:var(--brand)}
+.kpi-accent{border-left:3px solid var(--brand)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px}
+.card-title{font-size:13px;font-weight:500;display:flex;align-items:center;gap:7px}
+.card-title i{font-size:15px;color:var(--brand)}
+.card-0{padding:0}.card-0 .card-header{padding:14px 16px 0}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;font-size:11px;font-weight:500;color:var(--text3);padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface2);white-space:nowrap}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--border2);vertical-align:middle}
+.tbl tr:hover td{background:var(--surface2)}
+.tbl tr:last-child td{border-bottom:none}
+.strong{font-weight:500}
+.pill{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap;display:inline-flex;align-items:center;gap:3px}
+.pill-g{background:var(--success-bg);color:var(--success)}.pill-a{background:var(--warn-bg);color:var(--warn)}.pill-r{background:var(--danger-bg);color:var(--danger)}.pill-b{background:var(--info-bg);color:var(--info)}.pill-p{background:var(--brand-light);color:var(--brand)}.pill-gray{background:#f0ede8;color:#666}
+.filters{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:13px}
+.fc{padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:var(--font);color:var(--text);background:var(--surface);outline:none;width:100%;transition:border-color .15s}
+.fc:focus{border-color:var(--brand)}
+textarea.fc{resize:vertical;min-height:70px}
+.prog{height:5px;background:var(--surface3);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;background:var(--brand)}
+.prog-fill-warn{background:#f0a000}.prog-fill-danger{background:var(--danger)}
+.stock-alert{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;margin-bottom:8px;border:1px solid}
+.stock-critical{background:var(--danger-bg);border-color:#f5b8b5}.stock-warning{background:var(--warn-bg);border-color:#fcd98a}
+.stock-alert-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.stock-alert-body{flex:1}
+.stock-alert-title{font-size:12px;font-weight:500}
+.stock-alert-sub{font-size:11px;opacity:.7;margin-top:1px}
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;gap:8px}
+.section-title{font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px}
+.section-title i{font-size:14px;color:var(--brand)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:14px;padding:24px;width:600px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.18)}
+.modal-lg{width:820px}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.modal-title{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--text3);font-size:20px;padding:2px;border-radius:6px}
+.modal-close:hover{color:var(--text)}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border2)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.fg-full{grid-column:1/-1}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:11px;font-weight:500;color:var(--text2)}
+.form-section{font-size:11px;font-weight:600;color:var(--brand);letter-spacing:.5px;text-transform:uppercase;padding-top:8px;border-top:1px solid var(--border2);margin-top:4px}
+.bar-chart{display:flex;align-items:flex-end;gap:5px;height:90px;padding-top:10px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bar{width:100%;border-radius:4px 4px 0 0;background:var(--brand);min-height:4px}
+.bar-val{font-size:9px;font-weight:600;color:var(--brand);font-family:var(--mono)}
+.bar-lbl{font-size:9px;color:var(--text3);text-align:center}
+.geo-item{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border2)}
+.geo-item:last-child{border-bottom:none}
+.geo-rank{width:20px;height:20px;border-radius:50%;background:var(--brand-light);color:var(--brand);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.geo-name{flex:1;font-size:12px}
+.geo-pct{font-size:10px;font-weight:600;color:var(--brand);font-family:var(--mono);flex-shrink:0}
+.act-item{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border2)}
+.act-item:last-child{border-bottom:none}
+.act-dot{width:7px;height:7px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.act-text{font-size:12px;flex:1;line-height:1.5}
+.act-time{font-size:10px;color:var(--text3);white-space:nowrap;flex-shrink:0;margin-top:2px}
+.wh-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.wh-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.wh-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.wh-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.wh-stat{text-align:center;padding:8px;background:var(--surface2);border-radius:8px}
+.wh-stat-val{font-size:16px;font-weight:600;font-family:var(--mono)}
+.wh-stat-lbl{font-size:10px;color:var(--text3);margin-top:2px}
+.page-intro{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.page-intro-icon{width:38px;height:38px;border-radius:10px;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--brand);flex-shrink:0}
+.page-intro-text{flex:1}
+.page-intro-title{font-size:13px;font-weight:600}
+.page-intro-sub{font-size:11px;color:var(--text3);margin-top:2px;line-height:1.5}
+.fu-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:500}
+.fu-vencido{background:var(--danger-bg);color:var(--danger)}.fu-hoje{background:var(--warn-bg);color:var(--warn)}.fu-prox{background:var(--brand-light);color:var(--brand)}
+.import-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);margin-bottom:6px;font-size:12px;background:var(--surface)}
+.import-row.changed{border-color:#fcd98a;background:var(--warn-bg)}
+.import-row.new{border-color:#b3dfab;background:var(--success-bg)}
+.import-row.conflict{border-color:#f5b8b5;background:var(--danger-bg)}
+.emp-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;align-items:center;gap:12px}
+.emp-av{width:40px;height:40px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.perm-chip{font-size:10px;padding:2px 7px;border-radius:6px;font-weight:500;background:var(--surface3);color:var(--text2);border:1px solid var(--border)}
+.perm-on{background:var(--success-bg);color:var(--success);border-color:#b3dfab}
+.perm-off{background:var(--danger-bg);color:var(--danger);border-color:#f5b8b5}
+.sac-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px}
+.sac-id{font-size:10px;font-family:var(--mono);color:var(--brand);font-weight:500}
+.sac-title{font-size:12px;font-weight:500;margin:3px 0 4px}
+.sac-meta{font-size:11px;color:var(--text3)}
+.chat-wrap{display:flex;flex-direction:column;height:460px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--surface2)}
+.chat-msg{display:flex;gap:8px;max-width:80%}
+.chat-msg.me{flex-direction:row-reverse;align-self:flex-end}
+.chat-av{width:28px;height:28px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.chat-bubble{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:12px;line-height:1.5}
+.chat-msg.me .chat-bubble{background:var(--brand);color:#fff;border-color:var(--brand)}
+.chat-name{font-size:10px;color:var(--text3);margin-bottom:3px}
+.chat-time{font-size:10px;color:var(--text3);margin-top:3px}
+.chat-msg.me .chat-time{color:rgba(255,255,255,.7);text-align:right}
+.chat-input-row{display:flex;gap:8px;padding:10px;background:var(--surface);border-top:1px solid var(--border)}
+.chat-input-row input{flex:1;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;font-family:var(--font);outline:none}
+.chat-input-row input:focus{border-color:var(--brand)}
+.tog{width:36px;height:20px;border-radius:20px;background:#ddd;cursor:pointer;position:relative;transition:background .2s;border:none;flex-shrink:0}
+.tog.on{background:var(--success)}
+.tog::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s}
+.tog.on::after{left:18px}
+.comp-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="logo-mark">Commerce<span>Hub</span></div><div class="logo-sub">Gestão de E-commerce</div></div>
+  <div style="height:8px"></div>
+  <div class="nav-item active" onclick="nav('dashboard',this)"><i class="ti ti-layout-dashboard icon"></i><span class="lbl">Dashboard</span></div>
+  <div class="nav-item" onclick="nav('lojas',this)"><i class="ti ti-building-store icon"></i><span class="lbl">Lojas & Galpões</span></div>
+  <div class="nav-item" onclick="nav('importar',this)"><i class="ti ti-cloud-upload icon"></i><span class="lbl">Importar Dados</span><span class="notif-dot">!</span></div>
+  <div class="nav-divider"></div>
+  <div class="sector-hdr">Catálogo & Estoque</div>
+  <div class="nav-item" onclick="nav('produtos',this)"><i class="ti ti-tag icon"></i><span class="lbl">Produtos</span></div>
+  <div class="nav-item" onclick="nav('estoque',this)"><i class="ti ti-box icon"></i><span class="lbl">Estoque</span><span class="notif-dot">7</span></div>
+  <div class="nav-item" onclick="nav('queima',this)"><i class="ti ti-flame icon"></i><span class="lbl">Queima de Estoque</span></div>
+  <div class="nav-item" onclick="nav('fornecedores',this)"><i class="ti ti-truck icon"></i><span class="lbl">Fornecedores</span></div>
+  <div class="nav-item" onclick="nav('remanejo',this)"><i class="ti ti-arrows-transfer-down icon"></i><span class="lbl">Remanejo</span></div>
+  <div class="nav-divider"></div>
+  <div class="sector-hdr">Vendas</div>
+  <div class="nav-item" onclick="nav('pedidos',this)"><i class="ti ti-package icon"></i><span class="lbl">Pedidos</span><span class="notif-dot">12</span></div>
+  <div class="nav-item" onclick="nav('compradores',this)"><i class="ti ti-users icon"></i><span class="lbl">Compradores</span></div>
+  <div class="nav-item" onclick="nav('devolucoes',this)"><i class="ti ti-arrow-back-up icon"></i><span class="lbl">Devoluções</span><span class="notif-dot">3</span></div>
+  <div class="nav-item" onclick="nav('geo',this)"><i class="ti ti-map-pin icon"></i><span class="lbl">Geográfico</span></div>
+  <div class="nav-divider"></div>
+  <div class="sector-hdr">Análise</div>
+  <div class="nav-item" onclick="nav('financeiro',this)"><i class="ti ti-cash icon"></i><span class="lbl">Financeiro</span></div>
+  <div class="nav-item" onclick="nav('concorrentes',this)"><i class="ti ti-spy icon"></i><span class="lbl">Concorrentes</span></div>
+  <div class="nav-item" onclick="nav('relatorios',this)"><i class="ti ti-chart-bar icon"></i><span class="lbl">Relatórios</span></div>
+  <div class="nav-divider"></div>
+  <div class="sector-hdr">Equipe & Suporte</div>
+  <div class="nav-item" onclick="nav('funcionarios',this)"><i class="ti ti-id icon"></i><span class="lbl">Funcionários</span></div>
+  <div class="nav-item" onclick="nav('chat',this)"><i class="ti ti-messages icon"></i><span class="lbl">Chat Interno</span><span class="notif-dot">4</span></div>
+  <div class="nav-item" onclick="nav('sac',this)"><i class="ti ti-headset icon"></i><span class="lbl">SAC</span><span class="notif-dot">8</span></div>
+  <div class="nav-divider"></div>
+  <div class="nav-item" onclick="nav('config',this)"><i class="ti ti-settings icon"></i><span class="lbl">Configurações</span></div>
+  <div class="sidebar-footer">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="user-avatar">AM</div>
+      <div><div style="font-size:12px;font-weight:600;color:#fff" id="user-name">—</div><div class="user-role-badge">Administrador</div></div>
+    </div>
+  </div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left"><div class="page-title" id="pg-title">Dashboard</div></div>
+    <div class="search-box"><i class="ti ti-search" style="color:var(--text3);font-size:14px"></i><input placeholder="Busca global..."/></div>
+    <button class="btn btn-sm" onclick="openM('m-relatorio')"><i class="ti ti-download"></i>Exportar</button>
+    <button class="btn btn-sm btn-primary" onclick="openM('m-importar')"><i class="ti ti-cloud-upload"></i>Importar</button>
+  </div>
+  <div class="content">
+
+<div class="page active" id="p-dashboard">
+  <div class="g4">
+    <div class="kpi kpi-accent"><div class="kpi-label"><i class="ti ti-shopping-cart" style="color:var(--brand)"></i>Vendas hoje</div><div class="kpi-value">R$ 8.430</div><div class="kpi-badge bp">+18% vs ontem</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-package" style="color:var(--info)"></i>Pedidos pendentes</div><div class="kpi-value" id="kpi-pendentes">—</div><div class="kpi-badge bb">Aguardando envio</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-alert-triangle" style="color:var(--danger)"></i>Alertas de estoque</div><div class="kpi-value" id="kpi-alertas">—</div><div class="kpi-badge br">Ação necessária</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-truck" style="color:var(--success)"></i>Enviados hoje</div><div class="kpi-value" id="kpi-enviados">—</div><div class="kpi-badge bg">Hoje</div></div>
+  </div>
+  <div class="g4">
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-building-store"></i>Lojas ativas</div><div class="kpi-value">4</div><div class="kpi-sub">2 digitais · 2 físicas</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-arrow-back-up" style="color:var(--danger)"></i>Devoluções abertas</div><div class="kpi-value">3</div><div class="kpi-badge br">R$ 412</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-headset" style="color:var(--warn)"></i>Tickets SAC</div><div class="kpi-value" id="kpi-tickets">—</div><div class="kpi-badge ba">Abertos</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-currency-real" style="color:var(--success)"></i>Faturamento mês</div><div class="kpi-value">R$ 142k</div><div class="kpi-badge bg">Meta 130k ✓</div></div>
+  </div>
+  <div class="g21">
+    <div class="card"><div class="card-header"><div class="card-title"><i class="ti ti-chart-bar"></i>Vendas — últimos 7 dias</div></div>
+      <div class="bar-chart">
+        <div class="bar-col"><div class="bar-val">R$1.2k</div><div class="bar" style="height:36px"></div><div class="bar-lbl">Seg</div></div>
+        <div class="bar-col"><div class="bar-val">R$1.8k</div><div class="bar" style="height:52px"></div><div class="bar-lbl">Ter</div></div>
+        <div class="bar-col"><div class="bar-val">R$2.1k</div><div class="bar" style="height:62px"></div><div class="bar-lbl">Qua</div></div>
+        <div class="bar-col"><div class="bar-val">R$1.7k</div><div class="bar" style="height:50px"></div><div class="bar-lbl">Qui</div></div>
+        <div class="bar-col"><div class="bar-val">R$2.9k</div><div class="bar" style="height:80px;background:var(--brand-mid)"></div><div class="bar-lbl">Sex</div></div>
+        <div class="bar-col"><div class="bar-val">R$3.4k</div><div class="bar" style="height:90px"></div><div class="bar-lbl">Sáb</div></div>
+        <div class="bar-col"><div class="bar-val">R$2.6k</div><div class="bar" style="height:74px"></div><div class="bar-lbl">Dom</div></div>
+      </div>
+    </div>
+    <div class="card"><div class="card-header"><div class="card-title"><i class="ti ti-building-store"></i>Por loja</div></div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="font-size:12px;display:flex;align-items:center;gap:8px">Shopee<div class="prog" style="flex:1"><div class="prog-fill" style="width:38%"></div></div><span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--brand)">38%</span></div>
+        <div style="font-size:12px;display:flex;align-items:center;gap:8px">Mercado Livre<div class="prog" style="flex:1"><div class="prog-fill" style="width:31%"></div></div><span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--brand)">31%</span></div>
+        <div style="font-size:12px;display:flex;align-items:center;gap:8px">Site Próprio<div class="prog" style="flex:1"><div class="prog-fill" style="width:22%"></div></div><span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--brand)">22%</span></div>
+        <div style="font-size:12px;display:flex;align-items:center;gap:8px">Loja Física<div class="prog" style="flex:1"><div class="prog-fill" style="width:9%"></div></div><span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--brand)">9%</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="section-hdr"><div class="section-title"><i class="ti ti-alert-triangle"></i>Alertas críticos de estoque</div><button class="btn btn-sm" onclick="nav('estoque',null)">Ver todos</button></div>
+  <div id="dash-alertas" style="margin-bottom:14px"><div style="color:#999;font-size:12px;padding:10px 0">Carregando alertas...</div></div>
+  <div class="g2">
+    <div class="card card-0"><div class="card-header"><div class="card-title"><i class="ti ti-package"></i>Pedidos recentes</div><button class="btn btn-sm" onclick="nav('pedidos',null)">Ver todos</button></div>
+      <table class="tbl"><thead><tr><th>Pedido</th><th>Canal</th><th>Valor</th><th>Status</th></tr></thead><tbody id="dash-pedidos-tbody">
+        <tr><td colspan="4" style="text-align:center;color:#999;padding:16px">Carregando...</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card card-0"><div class="card-header"><div class="card-title"><i class="ti ti-messages"></i>Chat — Mensagens</div><button class="btn btn-sm" onclick="nav('chat',null)">Abrir</button></div>
+      <div style="padding:0 16px 14px">
+        <div class="act-item"><div class="act-dot" style="background:var(--brand)"></div><div class="act-text"><b>Carla:</b> Galpão SP sem Runner Pro!</div><div class="act-time">14min</div></div>
+        <div class="act-item"><div class="act-dot" style="background:var(--info)"></div><div class="act-text"><b>Lucas:</b> Cliente ML abriu contestação #4412</div><div class="act-time">32min</div></div>
+        <div class="act-item"><div class="act-dot" style="background:var(--success)"></div><div class="act-text"><b>Fernanda:</b> Shopee +40% ontem 🔥</div><div class="act-time">1h</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="page" id="p-lojas">
+  <div style="display:flex;justify-content:flex-end;margin-bottom:14px"><button class="btn btn-primary btn-sm" onclick="openM('m-nova-loja')"><i class="ti ti-plus"></i>Nova loja / Galpão</button></div>
+  <div class="g2" id="grid-lojas"><div style="color:#999;font-size:13px;padding:20px">Carregando...</div></div>
+</div>
+
+<div class="page" id="p-importar">
+  <div class="page-intro"><div class="page-intro-icon"><i class="ti ti-cloud-upload"></i></div><div class="page-intro-text"><div class="page-intro-title">Importação com Prévia de Conferência</div><div class="page-intro-sub">Importe via CSV/XLSX. Todos os dados são exibidos para conferência antes de confirmados.</div></div><button class="btn btn-primary" onclick="openM('m-importar')"><i class="ti ti-upload"></i>Importar arquivo</button></div>
+  <div class="section-hdr"><div class="section-title"><i class="ti ti-eye"></i>Prévia — Aguardando confirmação</div><div style="display:flex;gap:6px"><button class="btn btn-sm" style="color:var(--danger)"><i class="ti ti-x"></i>Cancelar tudo</button><button class="btn btn-sm btn-primary"><i class="ti ti-check"></i>Confirmar todos</button></div></div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;gap:10px;margin-bottom:12px;font-size:11px;color:var(--text3)">
+      <span><span style="display:inline-block;width:10px;height:10px;background:var(--success-bg);border:1px solid #b3dfab;border-radius:2px;margin-right:4px"></span>Novo</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:var(--warn-bg);border:1px solid #fcd98a;border-radius:2px;margin-right:4px"></span>Atualização</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:var(--danger-bg);border:1px solid #f5b8b5;border-radius:2px;margin-right:4px"></span>Conflito</span>
+    </div>
+    <div class="import-row new"><i class="ti ti-plus" style="color:var(--success)"></i><span class="strong" style="flex:1">Camiseta Polo Azul GG</span><span style="color:var(--text3);font-size:11px">SKU: CAM-PB-GG-001 · Estoque: 80 · R$89,90</span><span class="pill pill-g">Novo</span><button class="btn btn-sm"><i class="ti ti-check"></i>Confirmar</button></div>
+    <div class="import-row changed"><i class="ti ti-pencil" style="color:var(--warn)"></i><span class="strong" style="flex:1">Tênis Runner Pro 42</span><span style="color:var(--text3);font-size:11px">Preço: R$189→R$199 · Estoque: 12→45</span><span class="pill pill-a">Atualização</span><button class="btn btn-sm"><i class="ti ti-check"></i>Confirmar</button></div>
+    <div class="import-row conflict"><i class="ti ti-alert-triangle" style="color:var(--danger)"></i><span class="strong" style="flex:1">Mochila Urbana 20L</span><span style="color:var(--text3);font-size:11px">Conflito: SKU já existe com preço diferente</span><span class="pill pill-r">Conflito</span><button class="btn btn-sm" onclick="openM('m-conflito')"><i class="ti ti-eye"></i>Revisar</button></div>
+  </div>
+  <div class="section-hdr"><div class="section-title"><i class="ti ti-history"></i>Histórico</div></div>
+  <div class="card card-0"><table class="tbl"><thead><tr><th>Data</th><th>Arquivo</th><th>Registros</th><th>Novos</th><th>Atualizados</th><th>Conflitos</th><th>Status</th></tr></thead><tbody>
+    <tr><td>15/05 · 09:12</td><td>produtos_maio.csv</td><td>248</td><td>12</td><td>230</td><td>6</td><td><span class="pill pill-g">Confirmado</span></td></tr>
+    <tr><td>10/05 · 11:00</td><td>estoque_galpao_sp.xlsx</td><td>540</td><td>5</td><td>520</td><td>15</td><td><span class="pill pill-a">Parcial</span></td></tr>
+  </tbody></table></div>
+</div>
+
+<div class="page" id="p-produtos">
+  <div class="filters">
+    <select class="fc" style="width:auto"><option>Todas as categorias</option><option>Vestuário</option><option>Calçados</option></select>
+    <input class="fc" placeholder="Buscar produto / SKU..." style="width:200px"/>
+    <button class="btn btn-sm btn-primary" style="margin-left:auto" onclick="openM('m-produto')"><i class="ti ti-plus"></i>Novo produto</button>
+  </div>
+  <div class="card card-0"><table class="tbl"><thead><tr><th>Produto</th><th>SKU</th><th>Categoria</th><th>Preço</th><th>Custo</th><th>Margem</th><th>Canais</th><th>Status</th><th></th></tr></thead><tbody id="tbody-produtos"><tr><td colspan="9" style="text-align:center;padding:24px;color:#999">Carregando...</td></tr></tbody></table></div>
+</div>
+
+<div class="page" id="p-estoque">
+  <div class="g4">
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-box" style="color:var(--brand)"></i>Total SKUs</div><div class="kpi-value" id="kpi-total-skus">—</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-alert-triangle" style="color:var(--danger)"></i>Críticos</div><div class="kpi-value" id="kpi-criticos">—</div><div class="kpi-badge br">Urgente</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-clock" style="color:var(--warn)"></i>Abaixo do mínimo</div><div class="kpi-value" id="kpi-atencao">—</div><div class="kpi-badge ba">Atenção</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-check" style="color:var(--success)"></i>Estoque OK</div><div class="kpi-value" id="kpi-ok">—</div><div class="kpi-badge bg">OK</div></div>
+  </div>
+  <div class="section-hdr"><div class="section-title"><i class="ti ti-alert-triangle"></i>Alertas críticos</div><div style="display:flex;gap:6px"><button class="btn btn-sm btn-primary" onclick="openM('m-regra-estoque')"><i class="ti ti-settings"></i>Regras de mínimo</button><button class="btn btn-sm btn-primary" onclick="openM('m-pedido-fornecedor')"><i class="ti ti-send"></i>Pedir ao fornecedor</button></div></div>
+  <div class="filters">
+    <select class="fc" style="width:auto" id="filtro-estoque-loja"><option value="">Todas as lojas</option></select>
+    <input class="fc" placeholder="Buscar produto..." style="width:200px" oninput="filtrarEstoque(this.value)"/>
+  </div>
+  <div class="card card-0"><table class="tbl"><thead><tr><th>Produto</th><th>SKU</th><th>Loja</th><th>Atual</th><th>Mínimo</th><th>Venda/sem</th><th>Status</th><th></th></tr></thead><tbody id="tbody-estoque"><tr><td colspan="8" style="text-align:center;padding:24px;color:#999">Carregando...</td></tr></tbody></table></div>
+</div>
+
+<div class="page" id="p-queima">
+  <div class="page-intro"><div class="page-intro-icon"><i class="ti ti-flame"></i></div><div class="page-intro-text"><div class="page-intro-title">Queima de Estoque</div><div class="page-intro-sub">Produtos com excesso ou sazonalidade passada. Defina descontos e publique nos canais.</div></div><button class="btn btn-primary" onclick="openM('m-queima')"><i class="ti ti-plus"></i>Nova queima</button></div>
+  <div class="g3">
+    <div class="card"><div class="card-header"><div class="card-title"><i class="ti ti-tag" style="color:var(--danger)"></i>Camiseta Verão GG</div><span class="pill pill-r">-40%</span></div><div style="font-size:12px;color:var(--text3);margin-bottom:8px">Estoque: 280 un. · 45 dias sem movimento</div><div style="display:flex;gap:12px;margin-bottom:10px"><div><s style="color:var(--text3);font-size:11px">R$89,90</s><br><b style="color:var(--danger)">R$53,94</b></div><div style="border-left:1px solid var(--border);padding-left:12px"><span style="font-size:11px;color:var(--text3)">Canais</span><br><span class="pill pill-b">Shopee · ML</span></div></div><div class="prog" style="margin-bottom:6px"><div class="prog-fill prog-fill-warn" style="width:35%"></div></div><div style="font-size:10px;color:var(--text3)">Vendidos: 98/280 (35%)</div></div>
+    <div class="card"><div class="card-header"><div class="card-title"><i class="ti ti-tag" style="color:var(--warn)"></i>Sandália Slip-on 37</div><span class="pill pill-a">-25%</span></div><div style="font-size:12px;color:var(--text3);margin-bottom:8px">Estoque: 56 un. · Coleção passada</div><div style="display:flex;gap:12px;margin-bottom:10px"><div><s style="color:var(--text3);font-size:11px">R$129,90</s><br><b style="color:var(--warn)">R$97,43</b></div><div style="border-left:1px solid var(--border);padding-left:12px"><span style="font-size:11px;color:var(--text3)">Canal</span><br><span class="pill pill-gray">Site</span></div></div><div class="prog" style="margin-bottom:6px"><div class="prog-fill" style="width:60%"></div></div><div style="font-size:10px;color:var(--text3)">Vendidos: 34/56 (60%)</div></div>
+    <div class="card" style="border:1.5px dashed var(--border);background:var(--surface2);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;cursor:pointer" onclick="openM('m-queima')"><i class="ti ti-plus" style="font-size:24px;color:var(--text3)"></i><div style="font-size:12px;color:var(--text3);margin-top:8px">Adicionar à queima</div></div>
+  </div>
+</div>
+
+<div class="page" id="p-fornecedores">
+  <div style="display:flex;justify-content:flex-end;margin-bottom:14px"><button class="btn btn-primary btn-sm" onclick="openM('m-fornecedor')"><i class="ti ti-plus"></i>Novo fornecedor</button></div>
+  <div class="card card-0"><table class="tbl"><thead><tr><th>Fornecedor</th><th>CNPJ</th><th>Categoria</th><th>Prazo</th><th>Pedidos</th><th>Contato</th><th>Status</th><th></th></tr></thead><tbody id="tbody-fornecedores"><tr><td colspan="8" style="text-align:center;padding:24px;color:#999">Carregando...</td></tr></tbody></table></div>
+  <div class="section-hdr" style="margin-top:10px"><div class="section-title"><i class="ti ti-clock"></i>Pedidos em andamento</div></div>
+  <div class="card card-0"><table class="tbl"><thead><tr><th>Pedido</th><th>Fornecedor</th><th>Produto</th><th>Qtd</th><th>Emitido</th><th>Previsão</th><th>Status</th></tr></thead><tbody>
+    <tr><td class="strong" style="font-family:var(--mono)">#PF-0041</td><td>Confecções SP</td><td>Camiseta Básica M</td><td>300 un.</td><td>14/05</td><td>21/05</td><td><span class="pill pill-a">Em trânsito</span></td></tr>
+    <tr><td class="strong" style="font-family:var(--mono)">#PF-0039</td><td>BagFactory</td><td>Mochila Urbana 20L</td><td>100 un.</td><td>05/05</td><td>15/05</td><td><span class="pill pill-r">Atrasado</span></td></tr>
+  </tbody></table></div>
+</div>
+
+<div class="page" id="p-remanejo">
+  <div class="page-intro"><div class="page-intro-icon"><i class="ti ti-arrows-transfer-down"></i></div><div class="page-intro-text"><div class="page-intro-title">Remanejo entre Lojas / Galpões</div><div class="page-intro-sub">Transfira produtos entre canais conforme a demanda de cada loja.</div></div><button class="btn btn-primary" onclick="openM('m-remanejo')"><i class="ti ti-plus"></i>Novo remanejo</button></div>
+  <div class="card card-0"><table class="tbl"><thead><tr><th>Data</th><th>Produto</th><th>Origem</th><th>Destino</th><th>Qtd</th><th>Motivo</th><th>Responsável</th><th>Status</th></tr></thead><tbody>
+    <tr><td>15/05</td><td class="strong">Tênis Runner Pro 41</td><td>Galpão SP</td><td>Shopee</td><td>30 un.</td><td>Estoque baixo</td><td>Carla M.</td><td><span class="pill pill-g">Concluído</span></td></tr>
+    <tr><td>14/05</td><td class="strong">Mochila Urbana 20L</td><td>Site próprio</td><td>ML</td><td>15 un.</td><td>Maior demanda ML</td><td>Lucas P.</td><td><span class="pill pill-a">Em andamento</span></td></tr>
+  </tbody></table></div>
+</div>
+
+<div class="page" id="p-pedidos">
+  <div class="g4">
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-package"></i>Total hoje</div><div class="kpi-value">47</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-clock" style="color:var(--warn)"></i>Aguard. envio</div><div class="kpi-value">14</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-truck" style="color:var(--info)"></i>Em trânsito</div><div class="kpi-value">21</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-check" style="color:var(--success)"></i>Entregues</div><div class="kpi-value">12</div></div>
+  </div>
+  <div class="filters">
+    <select class="fc" style="width:auto"><option>Todos os canais</option><option>Shopee</option><option>ML</option><option>Site</option></select>
+    <select class="fc" style="width:auto"><option>Todos os status</option><option>Novo</option><option>Em separação</option><option>Enviado</option><option>Entregue</option></select>
+    <input class="fc" placeholder="Buscar pedido..." style="width:200px"/>
+    <button class="btn btn-sm" style="margin-left:auto"><i class="ti ti-download"></i>Excel</button>
+  </div>
+  <div class="card card-0"><table class="tbl"><thead><tr><th>Pedido</th><th>Canal</th><th>Comprador</th><th>Produto</th><th>Valor</th><th>Data</th><th>Status</th><th></th></tr></thead><tbody id="tbody-pedidos"><tr><td colspan="8" style="text-align:center;padding:24px;color:#999">Carregando...</td></tr></tbody></table></div>
+</div>
+
+<div class="page" id="p-compradores">
+  <div class="g4">
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-users"></i>Únicos</div><div class="kpi-value">2.840</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-repeat" style="color:var(--success)"></i>Recorrentes</div><div class="kpi-value">38%</div><div class="kpi-badge bg">↑ Bom</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-clock" style="color:var(--warn)"></i>Em risco churn</div><div class="kpi-value">94</div><div class="kpi-badge ba">+60 dias</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-currency-real" style="color:var(--brand)"></i>Ticket médio</div><div class="kpi-value">R$ 142</div></div>
+  </div>
+  <div class="card card-0"><table class="tbl"><thead><tr><th>Nome</th><th>Canal</th><th>Compras</th><th>Total gasto</th><th>Última compra</th><th>Status</th></tr></thead><tbody>
+    <tr><td class="strong">Joana Ferreira</td><td>ML</td><td>8</td><td>R$1.240</td><td>15/05</td><td><span class="pill pill-g">Ativo</span></td></tr>
+    <tr><td class="strong">Ricardo Alves</td><td>Shopee</td><td>3</td><td>R$210</td><td>15/05</td><td><span class="pill pill-g">Ativo</span></td></tr>
+    <tr><td class="strong">Cláudio Mendes</td><td>Shopee</td><td>12</td><td>R$2.890</td><td>04/03</td><td><span class="pill pill-r">Churn</span></td></tr>
+  </tbody></table></div>
+</div>
+
+<div class="page" id="p-devolucoes">
+  <div class="g4">
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-arrow-back-up" style="color:var(--danger)"></i>Abertas</div><div class="kpi-value">3</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-currency-real"></i>Valor em risco</div><div class="kpi-value">R$ 412</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-check" style="color:var(--success)"></i>Resolvidas (mês)</div><div class="kpi-value">18</div><div class="kpi-badge bg">85% 1ª resolução</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-percentage"></i>Taxa devolução</div><div class="kpi-value">1.8%</div><div class="kpi-badge bg">Abaixo 3% ✓</div></div>
+  </div>
+  <div class="card card-0"><table class="tbl"><thead><tr><th>Pedido</th><th>Canal</th><th>Comprador</th><th>Produto</th><th>Motivo</th><th>Valor</th><th>Status</th><th></th></tr></thead><tbody>
+    <tr><td class="strong" style="font-family:var(--mono)">#SH-44195</td><td><span class="pill pill-p">SH</span></td><td>Paulo Neves</td><td>Sandália Slip-on 37</td><td>Tamanho errado</td><td>R$97,43</td><td><span class="pill pill-a">Em análise</span></td><td><button class="btn btn-sm btn-primary"><i class="ti ti-check"></i>Resolver</button></td></tr>
+    <tr><td class="strong" style="font-family:var(--mono)">#ML-88310</td><td><span class="pill pill-a">ML</span></td><td>Beatriz Cardoso</td><td>Camiseta Básica P</td><td>Com defeito</td><td>R$64,90</td><td><span class="pill pill-r">Contestação ML</span></td><td><button class="btn btn-sm btn-primary"><i class="ti ti-eye"></i>Responder</button></td></tr>
+    <tr><td class="strong" style="font-family:var(--mono)">#WB-0088</td><td><span class="pill pill-gray">Site</span></td><td>Fábio Rocha</td><td>Mochila Urbana 20L</td><td>Não gostou</td><td>R$249,90</td><td><span class="pill pill-b">Aguardando dev.</span></td><td><button class="btn btn-sm"><i class="ti ti-eye"></i></button></td></tr>
+  </tbody></table></div>
+</div>
+
+<div class="page" id="p-geo">
+  <div class="g2">
+    <div class="card"><div class="card-header"><div class="card-title"><i class="ti ti-map-pin"></i>Vendas por estado</div></div>
+      <div class="geo-item"><div class="geo-rank">1</div><div class="geo-name">São Paulo</div><div class="prog" style="width:120px"><div class="prog-fill" style="width:80%"></div></div><div class="geo-pct">34%</div></div>
+      <div class="geo-item"><div class="geo-rank">2</div><div class="geo-name">Rio de Janeiro</div><div class="prog" style="width:120px"><div class="prog-fill" style="width:52%"></div></div><div class="geo-pct">22%</div></div>
+      <div class="geo-item"><div class="geo-rank">3</div><div class="geo-name">Minas Gerais</div><div class="prog" style="width:120px"><div class="prog-fill" style="width:33%"></div></div><div class="geo-pct">14%</div></div>
+      <div class="geo-item"><div class="geo-rank">4</div><div class="geo-name">Paraná</div><div class="prog" style="width:120px"><div class="prog-fill" style="width:24%"></div></div><div class="geo-pct">10%</div></div>
+    </div>
+    <div class="card"><div class="card-header"><div class="card-title"><i class="ti ti-building-store"></i>Por canal</div></div>
+      <div class="geo-item"><div class="geo-rank" style="background:var(--brand-light);color:var(--brand)">SH</div><div class="geo-name">Shopee</div><div class="prog" style="width:80px"><div class="prog-fill" style="width:38%"></div></div><div class="geo-pct">38%</div></div>
+      <div class="geo-item"><div class="geo-rank" style="background:#fff8e6;color:#f5a623">ML</div><div class="geo-name">Mercado Livre</div><div class="prog" style="width:80px"><div class="prog-fill" style="width:31%"></div></div><div class="geo-pct">31%</div></div>
+      <div class="geo-item"><div class="geo-rank" style="background:var(--info-bg);color:var(--info)">WB</div><div class="geo-name">Site Próprio</div><div class="prog" style="width:80px"><div class="prog-fill" style="width:22%"></div></div><div class="geo-pct">22%</div></div>
+      <div class="geo-item"><div class="geo-rank" style="background:#f0ede8;color:#666">FÍS</div><div class="geo-name">Loja Física</div><div class="prog" style="width:80px"><div class="prog-fill" style="width:9%"></div></div><div class="geo-pct">9%</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FINANCEIRO -->
+<div class="page" id="p-financeiro">
+  <div class="g4">
+    <div class="kpi kpi-accent"><div class="kpi-label"><i class="ti ti-trending-up" style="color:var(--brand)"></i>Receita bruta (mês)</div><div class="kpi-value">R$ 142k</div><div class="kpi-badge bg">+12%</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-percentage" style="color:var(--warn)"></i>Taxas marketplaces</div><div class="kpi-value">R$ 18.4k</div><div class="kpi-sub">13% da receita</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-truck" style="color:var(--info)"></i>Frete (custo)</div><div class="kpi-value">R$ 8.2k</div><div class="kpi-sub">5.8% da receita</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-cash" style="color:var(--success)"></i>Lucro líquido (est.)</div><div class="kpi-value">R$ 32.1k</div><div class="kpi-badge bg">22.6% margem</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="card-header"><div class="card-title"><i class="ti ti-chart-bar"></i>Faturamento por canal — mês</div></div>
+      <div class="bar-chart">
+        <div class="bar-col"><div class="bar-val">R$51k</div><div class="bar" style="height:90px"></div><div class="bar-lbl">Shopee</div></div>
+        <div class="bar-col"><div class="bar-val">R$44k</div><div class="bar" style="height:78px"></div><div class="bar-lbl">ML</div></div>
+        <div class="bar-col"><div class="bar-val">R$31k</div><div class="bar" style="height:55px;background:var(--brand-mid)"></div><div class="bar-lbl">Site</div></div>
+        <div class="bar-col"><div class="bar-val">R$16k</div><div class="bar" style="height:28px;background:#aaa"></div><div class="bar-lbl">Física</div></div>
+      </div>
+    </div>
+    <div class="card"><div class="card-header"><div class="card-title"><i class="ti ti-receipt"></i>Despesas</div></div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="font-size:12px;display:flex;align-items:center;gap:8px">Taxas marketplace<div class="prog" style="flex:1"><div class="prog-fill" style="width:45%"></div></div><span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--brand)">R$18.4k</span></div>
+        <div style="font-size:12px;display:flex;align-items:center;gap:8px">Frete<div class="prog" style="flex:1"><div class="prog-fill" style="width:20%"></div></div><span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--brand)">R$8.2k</span></div>
+        <div style="font-size:12px;display:flex;align-items:center;gap:8px">Embalagens<div class="prog" style="flex:1"><div class="prog-fill" style="width:13%"></div></div><span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--brand)">R$5.1k</span></div>
+        <div style="font-size:12px;display:flex;align-items:center;gap:8px">Pessoal<div class="prog" style="flex:1"><div class="prog-fill" style="width:19%"></div></div><span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--brand)">R$7.8k</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONCORRENTES -->
+<div class="page" id="p-concorrentes">
+  <div class="page-intro"><div class="page-intro-icon"><i class="ti ti-spy"></i></div><div class="page-intro-text"><div class="page-intro-title">Pesquisa de Concorrentes</div><div class="page-intro-sub">Monitore preços e produtos. Relatórios podem ser criados ou anexados por qualquer responsável.</div></div><button class="btn btn-primary" onclick="openM('m-concorrente')"><i class="ti ti-plus"></i>Adicionar concorrente</button></div>
+  <div class="comp-card">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
+      <div><div style="font-size:13px;font-weight:600">RunFast Store</div><div style="font-size:11px;color:var(--text3)">runfast.com.br · Shopee · ML</div></div>
+      <div style="text-align:right"><div style="font-size:18px;font-weight:700;color:var(--brand)">R$179,90</div><div style="font-size:11px;color:var(--danger)">Nosso preço: R$189 (+5%) ⚠️</div></div>
+    </div>
+    <table class="tbl" style="margin-bottom:10px"><thead><tr><th>Produto deles</th><th>Preço deles</th><th>Nosso preço</th><th>Diferença</th><th>Avaliação</th></tr></thead><tbody>
+      <tr><td>Runner X Pro 42</td><td style="font-family:var(--mono)">R$179,90</td><td style="font-family:var(--mono)">R$189,00</td><td><span class="pill pill-r">+5% nós</span></td><td>4.9★</td></tr>
+    </tbody></table>
+    <div style="display:flex;gap:8px"><button class="btn btn-sm btn-primary" onclick="openM('m-relatorio-concorrente')"><i class="ti ti-file-plus"></i>Criar relatório</button><button class="btn btn-sm" onclick="openM('m-anexar-relatorio')"><i class="ti ti-upload"></i>Anexar relatório</button></div>
+  </div>
+</div>
+
+<!-- RELATÓRIOS -->
+<div class="page" id="p-relatorios">
+  <div class="g3">
+    <div class="card" style="cursor:pointer" onclick="openM('m-relatorio')"><div class="card-title" style="margin-bottom:8px"><i class="ti ti-package"></i>Relatório de Estoque</div><div style="font-size:12px;color:var(--text3)">Por loja, galpão, canal. Alertas, giro, previsão de ruptura.</div><div style="margin-top:12px"><button class="btn btn-sm btn-primary"><i class="ti ti-download"></i>Gerar</button></div></div>
+    <div class="card" style="cursor:pointer" onclick="openM('m-relatorio')"><div class="card-title" style="margin-bottom:8px"><i class="ti ti-chart-bar"></i>Relatório de Vendas</div><div style="font-size:12px;color:var(--text3)">Por canal, período, produto, região.</div><div style="margin-top:12px"><button class="btn btn-sm btn-primary"><i class="ti ti-download"></i>Gerar</button></div></div>
+    <div class="card" style="cursor:pointer" onclick="openM('m-relatorio')"><div class="card-title" style="margin-bottom:8px"><i class="ti ti-cash"></i>Relatório Financeiro</div><div style="font-size:12px;color:var(--text3)">Margens, despesas e faturamento por canal.</div><div style="margin-top:12px"><button class="btn btn-sm btn-primary"><i class="ti ti-download"></i>Gerar</button></div></div>
+    <div class="card" style="cursor:pointer" onclick="openM('m-relatorio')"><div class="card-title" style="margin-bottom:8px"><i class="ti ti-headset"></i>Relatório SAC</div><div style="font-size:12px;color:var(--text3)">Tickets, SLA, tipos de reclamação, processos.</div><div style="margin-top:12px"><button class="btn btn-sm btn-primary"><i class="ti ti-download"></i>Gerar</button></div></div>
+    <div class="card" style="cursor:pointer" onclick="openM('m-relatorio')"><div class="card-title" style="margin-bottom:8px"><i class="ti ti-arrow-back-up"></i>Relatório Devoluções</div><div style="font-size:12px;color:var(--text3)">Taxa, motivos, impacto financeiro.</div><div style="margin-top:12px"><button class="btn btn-sm btn-primary"><i class="ti ti-download"></i>Gerar</button></div></div>
+    <div class="card" style="cursor:pointer" onclick="openM('m-relatorio')"><div class="card-title" style="margin-bottom:8px"><i class="ti ti-spy"></i>Relatório Concorrentes</div><div style="font-size:12px;color:var(--text3)">Comparativos de preço e análises cadastradas.</div><div style="margin-top:12px"><button class="btn btn-sm btn-primary"><i class="ti ti-download"></i>Gerar</button></div></div>
+  </div>
+</div>
+
+<!-- FUNCIONÁRIOS -->
+<div class="page" id="p-funcionarios">
+  <div class="page-intro"><div class="page-intro-icon"><i class="ti ti-shield-lock"></i></div><div class="page-intro-text"><div class="page-intro-title">Gestão de Funcionários & Controle de Acesso</div><div class="page-intro-sub">Cadastre, edite, suspenda ou exclua funcionários. Defina permissões individuais por módulo.</div></div><button class="btn btn-primary" onclick="openM('m-funcionario')"><i class="ti ti-plus"></i>Cadastrar funcionário</button></div>
+  <div class="g3" id="grid-funcionarios" style="margin-bottom:14px"><div style="color:#999;font-size:13px;padding:20px">Carregando...</div></div>
+  <div class="section-hdr"><div class="section-title"><i class="ti ti-lock"></i>Matriz de permissões</div></div>
+  <div class="card card-0"><table class="tbl"><thead><tr><th>Módulo</th><th>Ana (Admin)</th><th>Carla (Estoque)</th><th>Lucas (SAC)</th><th>Fernanda (Vendas)</th></tr></thead><tbody>
+    <tr><td>Dashboard</td><td><span class="perm-chip perm-on">✓ Total</span></td><td><span class="perm-chip perm-on">✓ Parcial</span></td><td><span class="perm-chip perm-on">✓ Parcial</span></td><td><span class="perm-chip perm-on">✓ Parcial</span></td></tr>
+    <tr><td>Estoque</td><td><span class="perm-chip perm-on">✓ Total</span></td><td><span class="perm-chip perm-on">✓ Total</span></td><td><span class="perm-chip perm-off">✗ Sem acesso</span></td><td><span class="perm-chip">👁 Leitura</span></td></tr>
+    <tr><td>Financeiro</td><td><span class="perm-chip perm-on">✓ Total</span></td><td><span class="perm-chip perm-off">✗ Sem acesso</span></td><td><span class="perm-chip perm-off">✗ Sem acesso</span></td><td><span class="perm-chip perm-off">✗ Sem acesso</span></td></tr>
+    <tr><td>SAC</td><td><span class="perm-chip perm-on">✓ Total</span></td><td><span class="perm-chip perm-off">✗ Sem acesso</span></td><td><span class="perm-chip perm-on">✓ Total</span></td><td><span class="perm-chip">👁 Leitura</span></td></tr>
+    <tr><td>Funcionários</td><td><span class="perm-chip perm-on">✓ Total</span></td><td><span class="perm-chip perm-off">✗ Sem acesso</span></td><td><span class="perm-chip perm-off">✗ Sem acesso</span></td><td><span class="perm-chip perm-off">✗ Sem acesso</span></td></tr>
+  </tbody></table></div>
+</div>
+
+<!-- CHAT -->
+<div class="page" id="p-chat">
+  <div class="g21">
+    <div class="card" style="padding:0">
+      <div class="card-header" style="padding:14px 16px;border-bottom:1px solid var(--border)"><div class="card-title"><i class="ti ti-messages"></i>Chat Interno — #geral</div><select class="fc" style="width:auto;padding:4px 8px;font-size:11px"><option>#geral</option><option>#estoque</option><option>#sac</option><option>#vendas</option></select></div>
+      <div class="chat-wrap" style="border:none;border-radius:0;height:460px">
+        <div class="chat-msgs" id="chat-msgs"></div>
+        <div class="chat-input-row"><input id="chat-input" placeholder="Mensagem para #geral..."/><button class="btn btn-primary btn-sm" onclick="sendChat()"><i class="ti ti-send"></i>Enviar</button></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="card"><div class="card-title" style="margin-bottom:10px"><i class="ti ti-users"></i>Equipe online</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;align-items:center;gap:8px"><div class="user-avatar" style="width:26px;height:26px;font-size:10px">AM</div><span style="font-size:12px">Ana (você)</span><div style="width:7px;height:7px;border-radius:50%;background:var(--success);margin-left:auto"></div></div>
+          <div style="display:flex;align-items:center;gap:8px"><div class="user-avatar" style="width:26px;height:26px;font-size:10px;background:#185fa5">CM</div><span style="font-size:12px">Carla</span><div style="width:7px;height:7px;border-radius:50%;background:var(--success);margin-left:auto"></div></div>
+          <div style="display:flex;align-items:center;gap:8px"><div class="user-avatar" style="width:26px;height:26px;font-size:10px;background:#2d7a1f">LP</div><span style="font-size:12px">Lucas</span><div style="width:7px;height:7px;border-radius:50%;background:var(--success);margin-left:auto"></div></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-title" style="margin-bottom:10px"><i class="ti ti-hash"></i>Canais</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:12px;padding:5px 8px;border-radius:6px;background:var(--brand-light);color:var(--brand);font-weight:500"># geral</div>
+          <div style="font-size:12px;padding:5px 8px;border-radius:6px;cursor:pointer"># estoque</div>
+          <div style="font-size:12px;padding:5px 8px;border-radius:6px;cursor:pointer"># sac</div>
+          <div style="font-size:12px;padding:5px 8px;border-radius:6px;cursor:pointer"># vendas</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SAC -->
+<div class="page" id="p-sac">
+  <div class="g4">
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-inbox" style="color:var(--brand)"></i>Tickets abertos</div><div class="kpi-value">8</div><div class="kpi-badge br">2 urgentes</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-check" style="color:var(--success)"></i>Resolvidos (mês)</div><div class="kpi-value">64</div><div class="kpi-badge bg">85% 1ª resolução</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-clock" style="color:var(--warn)"></i>Tempo médio resp.</div><div class="kpi-value">3h 20min</div><div class="kpi-badge ba">Meta 4h</div></div>
+    <div class="kpi"><div class="kpi-label"><i class="ti ti-scale" style="color:var(--danger)"></i>Processos abertos</div><div class="kpi-value">2</div><div class="kpi-badge br">Atenção jurídica</div></div>
+  </div>
+  <div class="filters">
+    <select class="fc" style="width:auto"><option>Todos os status</option><option>Aberto</option><option>Em andamento</option><option>Fechado</option></select>
+    <select class="fc" style="width:auto"><option>Todos os tipos</option><option>Reclamação</option><option>Devolução</option><option>Processo</option></select>
+    <button class="btn btn-sm btn-primary" style="margin-left:auto" onclick="openM('m-sac')"><i class="ti ti-plus"></i>Novo ticket</button>
+  </div>
+  <div class="card card-0"><table class="tbl"><thead><tr><th>#</th><th>Canal</th><th>Cliente</th><th>Tipo</th><th>Valor</th><th>Prioridade</th><th>Status</th><th></th></tr></thead><tbody id="tbody-sac"><tr><td colspan="8" style="text-align:center;padding:24px;color:#999">Carregando...</td></tr></tbody></table></div>
+</div>
+
+<!-- CONFIG -->
+<div class="page" id="p-config">
+  <div class="page-intro"><div class="page-intro-icon"><i class="ti ti-shield-lock"></i></div><div class="page-intro-text"><div class="page-intro-title">Configurações do Sistema</div><div class="page-intro-sub">Segurança, alertas de estoque e acesso de clientes. Dados criptografados (AES-256) e sigilo garantido.</div></div></div>
+  <div class="g2">
+    <div class="card"><div class="card-title" style="margin-bottom:14px"><i class="ti ti-shield-lock"></i>Segurança</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Autenticação 2FA</span><span class="pill pill-g">Ativado</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Criptografia</span><span class="pill pill-g">AES-256</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Log de auditoria</span><span class="pill pill-g">Ativado</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Sessão automática</span><span class="pill pill-b">30 min</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Backup automático</span><span class="pill pill-g">Diário</span></div>
+      </div>
+    </div>
+    <div class="card"><div class="card-title" style="margin-bottom:14px"><i class="ti ti-bell"></i>Alertas de estoque</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Alerta estoque crítico</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Alerta abaixo do mínimo</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Múltiplo mínimo padrão</span><span class="pill pill-b">2× venda semanal</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Sugestão de pedido ao atingir mínimo</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+      </div>
+    </div>
+    <div class="card"><div class="card-title" style="margin-bottom:14px"><i class="ti ti-id"></i>Funcionários</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Notificar admin ao cadastrar</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Enviar convite por e-mail</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Exigir 2FA para funcionários</span><button class="tog" onclick="this.classList.toggle('on')"></button></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Log de ações por funcionário</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+        <div style="margin-top:4px"><button class="btn btn-sm btn-primary" onclick="openM('m-funcionario')"><i class="ti ti-plus"></i>Cadastrar funcionário</button></div>
+      </div>
+    </div>
+    <div class="card"><div class="card-title" style="margin-bottom:14px"><i class="ti ti-users"></i>Acesso de clientes</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Página de login do cliente</span><a href="login_cliente.html" target="_blank" class="btn btn-sm btn-outline"><i class="ti ti-external-link"></i>Abrir</a></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Painel Admin (aprovações)</span><a href="painel_admin.html" target="_blank" class="btn btn-sm btn-outline"><i class="ti ti-external-link"></i>Abrir</a></div>
+        <div style="font-size:11px;color:var(--text3);line-height:1.6">Cada cliente vê somente os dados da própria loja. Você aprova manualmente cada novo acesso no painel admin.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </div></div></div>
+
+<!-- MODAIS -->
+<div class="modal-overlay" id="m-pedido-fornecedor"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-truck" style="color:var(--brand)"></i>Pedido ao Fornecedor</div><button class="modal-close" onclick="closeM('m-pedido-fornecedor')"><i class="ti ti-x"></i></button></div><div style="background:var(--warn-bg);border:1px solid #fcd98a;border-radius:8px;padding:10px 12px;font-size:12px;margin-bottom:14px;color:var(--warn)"><i class="ti ti-alert-triangle"></i> Estoque crítico. Qtd. sugerida = venda semanal × 2.</div><div class="form-grid"><div class="form-group fg-full"><label>Fornecedor</label><select class="fc select-fornecedor" id="pforn-fornecedor"><option value="">Selecione...</option></select></div><div class="form-group fg-full"><label>Produto</label><select class="fc select-produto" id="pforn-produto"><option value="">Selecione...</option></select></div><div class="form-group"><label>Quantidade</label><input class="fc" id="pforn-qtd" type="number" min="1"/></div><div class="form-group"><label>Urgência</label><select class="fc" id="pforn-urgencia"><option value="normal">Normal</option><option value="urgente">Urgente</option><option value="critico">Crítico</option></select></div><div class="form-group"><label>Previsão de entrega</label><input class="fc" id="pforn-previsao" type="date"/></div><div class="form-group fg-full"><label>Observações</label><textarea class="fc" id="pforn-obs"></textarea></div></div><div class="modal-footer"><button class="btn" onclick="closeM('m-pedido-fornecedor')">Cancelar</button><button class="btn btn-primary" onclick="salvarPedidoFornecedor()"><i class="ti ti-send"></i>Emitir pedido</button></div></div></div>
+<div class="modal-overlay" id="m-regra-estoque"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-settings"></i>Regra de Estoque Mínimo</div><button class="modal-close" onclick="closeM('m-regra-estoque')"><i class="ti ti-x"></i></button></div><div class="form-grid"><div class="form-group"><label>Produto / Categoria</label><select class="fc"><option>Todos os produtos</option><option>Vestuário</option><option>Calçados</option></select></div><div class="form-group"><label>Múltiplo de venda semanal</label><input class="fc" value="2" type="number" min="1" max="10"/></div><div class="form-group"><label>Loja</label><select class="fc"><option>Todas</option><option>Shopee</option><option>ML</option><option>Galpão SP</option></select></div><div class="form-group"><label>Alerta antecipado (dias)</label><input class="fc" value="5" type="number"/></div><div class="form-group"><label>Ação</label><select class="fc"><option>Apenas alerta</option><option>Alerta + sugestão de pedido</option></select></div><div class="form-group"><label>Notificar</label><select class="fc"><option>Ana Medeiros</option><option>Carla Moreira</option><option>Todos</option></select></div></div><div class="modal-footer"><button class="btn" onclick="closeM('m-regra-estoque')">Cancelar</button><button class="btn btn-primary"><i class="ti ti-check"></i>Salvar regra</button></div></div></div>
+<div class="modal-overlay" id="m-remanejo"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-arrows-transfer-down"></i>Novo Remanejo</div><button class="modal-close" onclick="closeM('m-remanejo')"><i class="ti ti-x"></i></button></div><div class="form-grid"><div class="form-group fg-full"><label>Produto</label><input class="fc" placeholder="Buscar produto..."/></div><div class="form-group"><label>Origem</label><select class="fc"><option>Galpão SP</option><option>Shopee</option><option>ML</option><option>Site</option></select></div><div class="form-group"><label>Destino</label><select class="fc"><option>Shopee</option><option>ML</option><option>Site</option><option>Galpão SP</option><option>Loja Física RJ</option></select></div><div class="form-group"><label>Quantidade</label><input class="fc" type="number"/></div><div class="form-group"><label>Previsão</label><input class="fc" type="date"/></div><div class="form-group"><label>Motivo</label><select class="fc"><option>Estoque baixo no destino</option><option>Excesso</option><option>Rebalancear lojas</option></select></div><div class="form-group fg-full"><label>Observações</label><textarea class="fc"></textarea></div></div><div class="modal-footer"><button class="btn" onclick="closeM('m-remanejo')">Cancelar</button><button class="btn btn-primary"><i class="ti ti-arrows-transfer-down"></i>Registrar</button></div></div></div>
+<div class="modal-overlay" id="m-importar"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-upload"></i>Importar Dados</div><button class="modal-close" onclick="closeM('m-importar')"><i class="ti ti-x"></i></button></div><div class="form-grid"><div class="form-group"><label>Tipo de dados</label><select class="fc"><option>Produtos</option><option>Estoque</option><option>Pedidos</option></select></div><div class="form-group"><label>Formato</label><select class="fc"><option>CSV</option><option>XLSX</option></select></div><div class="form-group fg-full"><label>Arquivo</label><input class="fc" type="file" accept=".csv,.xlsx"/></div><div class="form-group"><label>Destino</label><select class="fc"><option>Todas as lojas</option><option>Shopee</option><option>ML</option><option>Galpão SP</option></select></div><div class="form-group"><label>Em caso de conflito</label><select class="fc"><option>Mostrar para revisão</option><option>Manter dados existentes</option><option>Substituir pelos novos</option></select></div></div><div style="background:var(--info-bg);border:1px solid #a8c8f0;border-radius:8px;padding:10px 12px;font-size:12px;margin-top:4px;color:var(--info)"><i class="ti ti-info-circle"></i> Todos os dados passarão pela prévia de conferência antes da confirmação.</div><div class="modal-footer"><button class="btn" onclick="closeM('m-importar')">Cancelar</button><button class="btn btn-primary"><i class="ti ti-upload"></i>Importar e conferir</button></div></div></div>
+<div class="modal-overlay" id="m-funcionario"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-user-plus"></i>Cadastrar Funcionário</div><button class="modal-close" onclick="closeM('m-funcionario')"><i class="ti ti-x"></i></button></div><input type="hidden" id="func-id"/><div class="form-grid"><div class="form-group"><label>Nome completo</label><input class="fc" id="func-nome" placeholder="Nome"/></div><div class="form-group"><label>E-mail</label><input class="fc" id="func-email" type="email" placeholder="email@empresa.com"/></div><div class="form-group"><label>Cargo</label><select class="fc" id="func-cargo"><option>Estoque</option><option>SAC</option><option>Vendas</option><option>Financeiro</option><option>Administrador</option></select></div><div class="form-group"><label>Telefone</label><input class="fc" id="func-telefone"/></div><div class="form-section fg-full">Permissões de acesso</div><div class="form-group"><label>Estoque</label><select class="fc"><option>Sem acesso</option><option>Somente leitura</option><option>Acesso total</option></select></div><div class="form-group"><label>Pedidos</label><select class="fc"><option>Sem acesso</option><option>Somente leitura</option><option>Acesso total</option></select></div><div class="form-group"><label>Financeiro</label><select class="fc"><option>Sem acesso</option><option>Somente leitura</option><option>Acesso total</option></select></div><div class="form-group"><label>SAC</label><select class="fc"><option>Sem acesso</option><option>Somente leitura</option><option>Acesso total</option></select></div><div class="form-group"><label>Relatórios</label><select class="fc"><option>Sem acesso</option><option>Parcial</option><option>Acesso total</option></select></div><div class="form-group"><label>Funcionários</label><select class="fc"><option>Sem acesso</option><option>Acesso total</option></select></div></div><div class="modal-footer"><button class="btn" onclick="closeM('m-funcionario')">Cancelar</button><button class="btn btn-primary" onclick="salvarFuncionario()"><i class="ti ti-user-plus"></i>Salvar funcionário</button></div></div></div>
+<div class="modal-overlay" id="m-editar-funcionario"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-pencil"></i>Editar Funcionário</div><button class="modal-close" onclick="closeM('m-editar-funcionario')"><i class="ti ti-x"></i></button></div><div class="form-grid"><div class="form-group"><label>Nome completo</label><input class="fc" value="Carla Moreira"/></div><div class="form-group"><label>E-mail</label><input class="fc" value="carla@loja.com"/></div><div class="form-group"><label>Cargo</label><select class="fc"><option selected>Estoque</option><option>SAC</option><option>Vendas</option><option>Financeiro</option><option>Administrador</option></select></div><div class="form-group"><label>Telefone</label><input class="fc" value="(11) 99999-0000"/></div><div class="form-group"><label>Status</label><select class="fc"><option>Ativo</option><option>Suspenso</option></select></div><div class="form-group"><label>Redefinir senha</label><input class="fc" type="password" placeholder="Deixe em branco para manter"/></div></div><div style="margin-top:12px;padding:10px 12px;background:var(--danger-bg);border-radius:8px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:12px;color:var(--danger)"><i class="ti ti-trash"></i> Excluir funcionário permanentemente</span><button class="btn btn-sm btn-danger" onclick="confirmarExclusao(this)">Excluir</button></div><div class="modal-footer"><button class="btn" onclick="closeM('m-editar-funcionario')">Cancelar</button><button class="btn btn-primary"><i class="ti ti-check"></i>Salvar alterações</button></div></div></div>
+<div class="modal-overlay" id="m-permissoes-func"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-shield-lock"></i>Permissões — Carla Moreira</div><button class="modal-close" onclick="closeM('m-permissoes-func')"><i class="ti ti-x"></i></button></div><div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--success-bg);border-radius:8px;font-size:12px"><span>Estoque</span><select class="fc" style="width:180px;padding:4px 8px"><option>Acesso total</option><option>Somente leitura</option><option>Sem acesso</option></select></div><div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface2);border-radius:8px;font-size:12px"><span>Pedidos</span><select class="fc" style="width:180px;padding:4px 8px"><option>Somente leitura</option><option>Acesso total</option><option>Sem acesso</option></select></div><div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--danger-bg);border-radius:8px;font-size:12px"><span>Financeiro</span><select class="fc" style="width:180px;padding:4px 8px"><option>Sem acesso</option><option>Somente leitura</option><option>Acesso total</option></select></div><div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--danger-bg);border-radius:8px;font-size:12px"><span>Funcionários</span><select class="fc" style="width:180px;padding:4px 8px"><option>Sem acesso</option><option>Acesso total</option></select></div><div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface2);border-radius:8px;font-size:12px"><span>SAC</span><select class="fc" style="width:180px;padding:4px 8px"><option>Somente leitura</option><option>Acesso total</option><option>Sem acesso</option></select></div></div><div class="modal-footer"><button class="btn" onclick="closeM('m-permissoes-func')">Cancelar</button><button class="btn btn-primary"><i class="ti ti-check"></i>Salvar</button></div></div></div>
+<div class="modal-overlay" id="m-sac"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-headset"></i>Novo Ticket SAC</div><button class="modal-close" onclick="closeM('m-sac')"><i class="ti ti-x"></i></button></div><input type="hidden" id="sac-id"/><div class="form-grid"><div class="form-group"><label>Canal</label><select class="fc" id="sac-canal"><option>Shopee</option><option>ML</option><option>Site</option><option>WhatsApp</option></select></div><div class="form-group"><label>Tipo</label><select class="fc" id="sac-tipo"><option>Reclamação</option><option>Devolução</option><option>Produto com defeito</option><option>Atraso</option><option>Processo</option></select></div><div class="form-group"><label>Cliente</label><input class="fc" id="sac-cliente" placeholder="Nome do cliente"/></div><div class="form-group"><label>Pedido relacionado</label><input class="fc" id="sac-pedido" placeholder="#ML-00000"/></div><div class="form-group fg-full"><label>Descrição</label><textarea class="fc" id="sac-descricao" placeholder="Descreva o problema..."></textarea></div><div class="form-group"><label>Valor (R$)</label><input class="fc" id="sac-valor" type="number"/></div><div class="form-group"><label>Prioridade</label><select class="fc" id="sac-prioridade"><option value="normal">Normal</option><option value="alta">Alta</option><option value="urgente">Urgente</option></select></div><div class="form-group"><label>Responsável</label><input class="fc" id="sac-responsavel" placeholder="Nome do responsável"/></div><div class="form-group"><label>SLA (horas)</label><input class="fc" id="sac-sla" value="24" type="number"/></div><div class="form-group"><label>É processo judicial?</label><select class="fc" id="sac-processo"><option>Não</option><option>Sim — notificação</option><option>Sim — processo aberto</option></select></div><div class="form-group fg-full"><label>Número do processo</label><input class="fc" placeholder="Número / protocolo (se aplicável)"/></div></div><div class="modal-footer"><button class="btn" onclick="closeM('m-sac')">Cancelar</button><button class="btn btn-primary" onclick="salvarTicket()"><i class="ti ti-plus"></i>Abrir ticket</button></div></div></div>
+<div class="modal-overlay" id="m-sac-detalhe"><div class="modal modal-lg"><div class="modal-header"><div class="modal-title"><i class="ti ti-headset"></i>Ticket #SAC-0112</div><button class="modal-close" onclick="closeM('m-sac-detalhe')"><i class="ti ti-x"></i></button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;font-size:12px"><div><b>Cliente:</b> Beatriz Cardoso</div><div><b>Canal:</b> Mercado Livre</div><div><b>Pedido:</b> #ML-88310</div><div><b>Valor:</b> R$64,90</div></div><div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:12px;margin-bottom:12px;line-height:1.6"><b>Descrição:</b> Camiseta Básica P chegou com costura rasgada na manga.</div><div class="form-grid"><div class="form-group"><label>Status</label><select class="fc"><option>Aberto</option><option>Em andamento</option><option>Fechado — resolvido</option></select></div><div class="form-group"><label>Resolução</label><select class="fc"><option>Reenvio do produto</option><option>Reembolso</option><option>Voucher</option><option>Em análise</option></select></div><div class="form-group fg-full"><label>Resposta ao cliente</label><textarea class="fc" placeholder="Mensagem para o cliente..."></textarea></div></div><div class="modal-footer"><button class="btn" onclick="closeM('m-sac-detalhe')">Fechar</button><button class="btn btn-primary"><i class="ti ti-send"></i>Responder e atualizar</button></div></div></div>
+<div class="modal-overlay" id="m-queima"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-flame"></i>Campanha de Queima</div><button class="modal-close" onclick="closeM('m-queima')"><i class="ti ti-x"></i></button></div><div class="form-grid"><div class="form-group fg-full"><label>Produto</label><input class="fc" placeholder="Selecione o produto..."/></div><div class="form-group"><label>Desconto (%)</label><input class="fc" type="number"/></div><div class="form-group"><label>Quantidade máxima</label><input class="fc" type="number"/></div><div class="form-group"><label>Início</label><input class="fc" type="date"/></div><div class="form-group"><label>Fim</label><input class="fc" type="date"/></div><div class="form-group fg-full"><label>Publicar nos canais</label><div style="display:flex;gap:8px;margin-top:4px"><label style="display:flex;align-items:center;gap:5px;font-size:12px"><input type="checkbox" checked/> Shopee</label><label style="display:flex;align-items:center;gap:5px;font-size:12px"><input type="checkbox" checked/> ML</label><label style="display:flex;align-items:center;gap:5px;font-size:12px"><input type="checkbox"/> Site</label></div></div></div><div class="modal-footer"><button class="btn" onclick="closeM('m-queima')">Cancelar</button><button class="btn btn-primary"><i class="ti ti-flame"></i>Publicar</button></div></div></div>
+<div class="modal-overlay" id="m-concorrente"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-spy"></i>Cadastrar Concorrente</div><button class="modal-close" onclick="closeM('m-concorrente')"><i class="ti ti-x"></i></button></div><div class="form-grid"><div class="form-group"><label>Nome</label><input class="fc"/></div><div class="form-group"><label>Site</label><input class="fc" placeholder="https://..."/></div><div class="form-group fg-full"><label>Produtos para monitorar</label><textarea class="fc"></textarea></div><div class="form-group fg-full"><label>Notas</label><textarea class="fc"></textarea></div></div><div class="modal-footer"><button class="btn" onclick="closeM('m-concorrente')">Cancelar</button><button class="btn btn-primary"><i class="ti ti-plus"></i>Cadastrar</button></div></div></div>
+<div class="modal-overlay" id="m-relatorio-concorrente"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-file-plus"></i>Criar Relatório de Concorrente</div><button class="modal-close" onclick="closeM('m-relatorio-concorrente')"><i class="ti ti-x"></i></button></div><div class="form-grid"><div class="form-group fg-full"><label>Título</label><input class="fc"/></div><div class="form-group"><label>Concorrente</label><select class="fc"><option>RunFast Store</option></select></div><div class="form-group"><label>Responsável</label><select class="fc"><option>Ana Medeiros</option><option>Fernanda Nunes</option></select></div><div class="form-group fg-full"><label>Análise de preços</label><textarea class="fc"></textarea></div><div class="form-group fg-full"><label>Pontos de atenção</label><textarea class="fc"></textarea></div></div><div class="modal-footer"><button class="btn" onclick="closeM('m-relatorio-concorrente')">Cancelar</button><button class="btn btn-primary"><i class="ti ti-file-check"></i>Salvar</button></div></div></div>
+<div class="modal-overlay" id="m-anexar-relatorio"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-upload"></i>Anexar Relatório</div><button class="modal-close" onclick="closeM('m-anexar-relatorio')"><i class="ti ti-x"></i></button></div><div class="form-grid"><div class="form-group fg-full"><label>Concorrente</label><select class="fc"><option>RunFast Store</option></select></div><div class="form-group fg-full"><label>Arquivo</label><input class="fc" type="file" accept=".pdf,.xlsx,.docx"/></div><div class="form-group fg-full"><label>Título / Descrição</label><input class="fc"/></div><div class="form-group"><label>Responsável</label><select class="fc"><option>Ana Medeiros</option><option>Fernanda Nunes</option></select></div><div class="form-group"><label>Visível para</label><select class="fc"><option>Só administradores</option><option>Vendas + Admin</option><option>Toda a equipe</option></select></div></div><div class="modal-footer"><button class="btn" onclick="closeM('m-anexar-relatorio')">Cancelar</button><button class="btn btn-primary"><i class="ti ti-upload"></i>Anexar</button></div></div></div>
+<div class="modal-overlay" id="m-relatorio"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-download"></i>Exportar Relatório</div><button class="modal-close" onclick="closeM('m-relatorio')"><i class="ti ti-x"></i></button></div><div class="form-grid"><div class="form-group"><label>Tipo</label><select class="fc"><option>Vendas por canal</option><option>Estoque</option><option>Financeiro</option><option>SAC</option><option>Devoluções</option><option>Completo</option></select></div><div class="form-group"><label>Loja</label><select class="fc"><option>Todas</option><option>Shopee</option><option>ML</option><option>Site</option><option>Galpão SP</option></select></div><div class="form-group"><label>Período início</label><input class="fc" type="date"/></div><div class="form-group"><label>Período fim</label><input class="fc" type="date"/></div><div class="form-group"><label>Formato</label><select class="fc"><option>Excel (.xlsx)</option><option>PDF</option><option>CSV</option></select></div><div class="form-group"><label>Enviar por e-mail</label><select class="fc"><option>Não enviar</option><option>Ana Medeiros</option><option>Todos os admins</option></select></div></div><div class="modal-footer"><button class="btn" onclick="closeM('m-relatorio')">Cancelar</button><button class="btn btn-primary"><i class="ti ti-download"></i>Gerar relatório</button></div></div></div>
+<div class="modal-overlay" id="m-nova-loja"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-building-store"></i>Nova Loja / Galpão</div><button class="modal-close" onclick="closeM('m-nova-loja')"><i class="ti ti-x"></i></button></div><input type="hidden" id="loja-id"/><div class="form-grid"><div class="form-group"><label>Nome</label><input class="fc" id="loja-nome"/></div><div class="form-group"><label>Tipo</label><select class="fc" id="loja-tipo"><option value="digital_marketplace">Digital — Marketplace</option><option value="digital_site">Digital — Site próprio</option><option value="fisico_galpao">Físico — Galpão</option><option value="fisico_loja">Físico — Loja presencial</option></select></div><div class="form-group"><label>Marketplace</label><input class="fc" id="loja-marketplace" placeholder="Ex: Shopee, Mercado Livre"/></div><div class="form-group"><label>Responsável</label><input class="fc" id="loja-responsavel" placeholder="Nome do responsável"/></div><div class="form-group fg-full"><label>Endereço (se físico)</label><input class="fc" id="loja-endereco"/></div></div><div class="modal-footer"><button class="btn" onclick="closeM('m-nova-loja')">Cancelar</button><button class="btn btn-primary" onclick="salvarLoja()"><i class="ti ti-plus"></i>Salvar loja</button></div></div></div>
+<div class="modal-overlay" id="m-produto"><div class="modal"><div class="modal-header"><div class="modal-title" id="m-produto-titulo"><i class="ti ti-tag"></i>Cadastrar Produto</div><button class="modal-close" onclick="closeM('m-produto');limparFormProduto()"><i class="ti ti-x"></i></button></div><input type="hidden" id="prod-id"/><div class="form-grid"><div class="form-group fg-full"><label>Nome do produto</label><input class="fc" id="prod-nome" placeholder="Ex: Camiseta Básica P"/></div><div class="form-group"><label>SKU</label><input class="fc" id="prod-sku" placeholder="Ex: CAM-BAS-P"/></div><div class="form-group"><label>Categoria</label><select class="fc" id="prod-categoria"><option>Vestuário</option><option>Calçados</option><option>Acessórios</option></select></div><div class="form-group"><label>Preço de venda (R$)</label><input class="fc" id="prod-preco" type="number" step="0.01"/></div><div class="form-group"><label>Custo (R$)</label><input class="fc" id="prod-custo" type="number" step="0.01"/></div><div class="form-group" id="prod-estoque-row"><label>Estoque inicial</label><input class="fc" id="prod-estoque-inicial" type="number"/></div><div class="form-group" id="prod-estoque-row"><label>Estoque mínimo</label><input class="fc" id="prod-estoque-minimo" type="number" placeholder="Deixe 0 para calcular"/></div><div class="form-group fg-full"><label>Publicar nos canais</label><div style="display:flex;gap:8px;margin-top:4px"><label style="display:flex;align-items:center;gap:5px;font-size:12px"><input type="checkbox" class="prod-canal" value="Shopee" checked/> Shopee</label><label style="display:flex;align-items:center;gap:5px;font-size:12px"><input type="checkbox" class="prod-canal" value="ML" checked/> ML</label><label style="display:flex;align-items:center;gap:5px;font-size:12px"><input type="checkbox" class="prod-canal" value="Site"/> Site</label></div></div></div><div class="modal-footer"><button class="btn" onclick="closeM('m-produto');limparFormProduto()">Cancelar</button><button class="btn btn-primary" onclick="salvarProduto()"><i class="ti ti-plus"></i>Salvar produto</button></div></div></div>
+<div class="modal-overlay" id="m-conflito"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-alert-triangle" style="color:var(--danger)"></i>Conflito de Importação</div><button class="modal-close" onclick="closeM('m-conflito')"><i class="ti ti-x"></i></button></div><div style="font-size:12px;margin-bottom:14px">O produto abaixo já existe com dados diferentes.</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px"><div style="background:var(--surface2);padding:12px;border-radius:8px;font-size:12px"><div style="font-weight:600;margin-bottom:6px;color:var(--text3)">Dado atual</div><div>Mochila Urbana 20L · R$249,90 · 43 un.</div></div><div style="background:var(--warn-bg);padding:12px;border-radius:8px;font-size:12px;border:1px solid #fcd98a"><div style="font-weight:600;margin-bottom:6px;color:var(--warn)">Dado importado</div><div>Mochila Urbana 20L · R$229,90 · 58 un.</div></div></div><div class="modal-footer"><button class="btn" onclick="closeM('m-conflito')">Manter atual</button><button class="btn btn-outline" onclick="closeM('m-conflito')">Usar importado</button><button class="btn btn-primary" onclick="closeM('m-conflito')">Revisar campo a campo</button></div></div></div>
+<div class="modal-overlay" id="m-fornecedor"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-truck"></i>Novo Fornecedor</div><button class="modal-close" onclick="closeM('m-fornecedor')"><i class="ti ti-x"></i></button></div><input type="hidden" id="forn-id"/><div class="form-grid"><div class="form-group"><label>Razão social</label><input class="fc" id="forn-razao"/></div><div class="form-group"><label>CNPJ</label><input class="fc" id="forn-cnpj" placeholder="00.000.000/0001-00"/></div><div class="form-group"><label>Categoria</label><input class="fc" id="forn-categoria"/></div><div class="form-group"><label>Prazo de entrega</label><input class="fc" id="forn-prazo"/></div><div class="form-group"><label>Telefone</label><input class="fc" id="forn-telefone"/></div><div class="form-group"><label>E-mail</label><input class="fc" id="forn-email" type="email"/></div><div class="form-group fg-full"><label>Observações</label><textarea class="fc" id="forn-obs"></textarea></div></div><div class="modal-footer"><button class="btn" onclick="closeM('m-fornecedor')">Cancelar</button><button class="btn btn-primary" onclick="salvarFornecedor()"><i class="ti ti-plus"></i>Salvar fornecedor</button></div></div></div>
+
+<script>
+const pageTitles={dashboard:'Dashboard',lojas:'Lojas & Galpões',importar:'Importar Dados',produtos:'Produtos',estoque:'Controle de Estoque',queima:'Queima de Estoque',fornecedores:'Fornecedores',remanejo:'Remanejo de Estoque',pedidos:'Pedidos',compradores:'Compradores',devolucoes:'Devoluções',geo:'Mapa de Vendas',financeiro:'Financeiro',concorrentes:'Pesquisa de Concorrentes',relatorios:'Relatórios',funcionarios:'Funcionários & Permissões',chat:'Chat Interno',sac:'SAC — Atendimento',config:'Configurações'};
+function nav(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg=document.getElementById('p-'+id);if(pg)pg.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el){el.classList.add('active');}else{document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'"))n.classList.add('active');});}
+  document.getElementById('pg-title').textContent=pageTitles[id]||id;
+}
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
+document.getElementById('chat-input')?.addEventListener('keydown',e=>{if(e.key==='Enter')sendChat();});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/hub.js"></script>
+
+<div class="modal-overlay" id="m-ajuste-estoque"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-edit"></i>Ajustar Estoque</div><button class="modal-close" onclick="closeM('m-ajuste-estoque')"><i class="ti ti-x"></i></button></div><input type="hidden" id="est-id"/><div class="form-grid"><div class="form-group"><label>Quantidade atual</label><input class="fc" id="est-quantidade" type="number" min="0"/></div><div class="form-group"><label>Estoque mínimo</label><input class="fc" id="est-minimo" type="number" min="0"/></div><div class="form-group fg-full"><label>Venda semanal média</label><input class="fc" id="est-venda-semanal" type="number" min="0"/></div></div><div class="modal-footer"><button class="btn" onclick="closeM('m-ajuste-estoque')">Cancelar</button><button class="btn btn-primary" onclick="salvarAjusteEstoque()"><i class="ti ti-check"></i>Salvar</button></div></div></div>
+</body></html>

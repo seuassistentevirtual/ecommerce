@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CommerceHub — Painel Admin</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --brand:#e8521a;--brand-light:#fff1ec;
+  --dark:#0f0f0f;--dark2:#1a1a1a;
+  --surface:#fff;--surface2:#fafaf9;--surface3:#f5f4f0;
+  --border:#e8e4de;--border2:#f0ede8;
+  --text:#1a1a1a;--text2:#555;--text3:#999;
+  --success:#2d7a1f;--success-bg:#eaf4e5;
+  --warn:#8a5a00;--warn-bg:#fff8e6;
+  --danger:#c0392b;--danger-bg:#fdecea;
+  --info:#1a5fa8;--info-bg:#e8f0fb;
+  --radius:10px;--font:'Sora',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+}
+body{font-family:var(--font);background:var(--surface3);color:var(--text);font-size:13px}
+.app{display:flex;height:100vh}
+/* SIDEBAR */
+.sidebar{width:210px;background:var(--dark);color:#fff;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sidebar-logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.07)}
+.logo-mark{font-size:15px;font-weight:700;color:#fff}.logo-mark span{color:var(--brand)}
+.logo-sub{font-size:9px;opacity:.4;margin-top:2px;letter-spacing:.8px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;margin:1px 6px;border-radius:8px;cursor:pointer;font-size:12px;color:rgba(255,255,255,.6);transition:all .15s;user-select:none}
+.nav-item i{font-size:14px;width:16px;text-align:center;flex-shrink:0}
+.nav-item span{flex:1}
+.nav-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-item.active{background:var(--brand);color:#fff;font-weight:500}
+.nav-badge{background:var(--brand);color:#fff;border-radius:10px;font-size:9px;padding:1px 5px;font-weight:700}
+.nav-item.active .nav-badge{background:rgba(255,255,255,.3)}
+.sector-hdr{padding:14px 16px 4px;font-size:9px;font-weight:700;letter-spacing:1.2px;opacity:.3;text-transform:uppercase}
+.nav-divider{height:.5px;background:rgba(255,255,255,.07);margin:6px 10px}
+.sidebar-footer{margin-top:auto;padding:12px 10px;border-top:1px solid rgba(255,255,255,.07)}
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;gap:10px}
+.page-title{font-size:15px;font-weight:600;flex:1}
+.admin-badge{font-size:10px;padding:3px 9px;border-radius:20px;background:var(--brand-light);color:var(--brand);border:1px solid rgba(232,82,26,.2);font-weight:600}
+.content{flex:1;overflow-y:auto;padding:20px}
+.content::-webkit-scrollbar{width:5px}.content::-webkit-scrollbar-thumb{background:#ddd;border-radius:3px}
+.page{display:none}.page.active{display:block}
+/* COMPONENTS */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.kpi-label{font-size:11px;color:var(--text3);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.kpi-value{font-size:24px;font-weight:600;letter-spacing:-.5px}
+.kpi-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:2px 7px;border-radius:8px;margin-top:4px;font-weight:500}
+.bg{background:var(--success-bg);color:var(--success)}.ba{background:var(--warn-bg);color:var(--warn)}.br{background:var(--danger-bg);color:var(--danger)}.bb{background:var(--info-bg);color:var(--info)}.bp{background:var(--brand-light);color:var(--brand)}
+.kpi-accent{border-left:3px solid var(--brand)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px}
+.card-title{font-size:13px;font-weight:500;display:flex;align-items:center;gap:7px}
+.card-title i{font-size:15px;color:var(--brand)}
+.card-0{padding:0}.card-0 .card-header{padding:14px 16px 0}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;font-size:11px;font-weight:500;color:var(--text3);padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--border2);vertical-align:middle}
+.tbl tr:hover td{background:var(--surface2)}
+.tbl tr:last-child td{border-bottom:none}
+.strong{font-weight:500}
+.pill{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;display:inline-flex;align-items:center;gap:3px}
+.pill-g{background:var(--success-bg);color:var(--success)}.pill-a{background:var(--warn-bg);color:var(--warn)}.pill-r{background:var(--danger-bg);color:var(--danger)}.pill-b{background:var(--info-bg);color:var(--info)}.pill-p{background:var(--brand-light);color:var(--brand)}.pill-gray{background:#f0ede8;color:#666}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text);font-family:var(--font);transition:all .15s;white-space:nowrap}
+.btn:hover{background:var(--surface3)}
+.btn-primary{background:var(--brand);color:#fff;border-color:var(--brand)}.btn-primary:hover{background:#c94114}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-ghost{background:transparent;border:none;color:var(--text3);padding:5px 7px}.btn-ghost:hover{color:var(--text);background:var(--surface3)}
+.btn-danger{background:var(--danger-bg);color:var(--danger);border-color:#f5b8b5}.btn-danger:hover{background:#f9dcda}
+.btn-success{background:var(--success-bg);color:var(--success);border-color:#b3dfab}
+.fc{padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:var(--font);color:var(--text);background:var(--surface);outline:none;width:100%;transition:border-color .15s}
+.fc:focus{border-color:var(--brand)}
+textarea.fc{resize:vertical;min-height:70px}
+.filters{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:13px}
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.section-title{font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px}
+.section-title i{color:var(--brand)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:14px;padding:24px;width:560px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.18)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.modal-title{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--text3);font-size:20px;padding:2px;border-radius:6px}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border2)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.fg-full{grid-column:1/-1}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:11px;font-weight:500;color:var(--text2)}
+.form-section{font-size:11px;font-weight:600;color:var(--brand);letter-spacing:.5px;text-transform:uppercase;padding-top:8px;border-top:1px solid var(--border2);margin-top:4px}
+/* cliente card */
+.client-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.client-av{width:40px;height:40px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.client-info{flex:1}
+.client-name{font-size:13px;font-weight:500}
+.client-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.perm-tog{display:flex;align-items:center;gap:6px;font-size:11px}
+.tog{width:36px;height:20px;border-radius:20px;background:#ddd;cursor:pointer;position:relative;transition:background .2s;border:none;flex-shrink:0}
+.tog.on{background:var(--success)}
+.tog::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s}
+.tog.on::after{left:18px}
+/* activity */
+.act-item{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border2)}
+.act-item:last-child{border-bottom:none}
+.act-dot{width:7px;height:7px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.act-text{font-size:12px;flex:1;line-height:1.5}
+.act-time{font-size:10px;color:var(--text3);flex-shrink:0;margin-top:2px}
+/* solicitações */
+.sol-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px;border-left:3px solid var(--warn)}
+.sol-card.aprovado{border-left-color:var(--success)}
+.sol-card.rejeitado{border-left-color:var(--danger)}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">Commerce<span>Hub</span></div>
+    <div class="logo-sub">Painel Administrador</div>
+  </div>
+  <div style="height:8px"></div>
+  <div class="nav-item active" onclick="nav('dashboard',this)"><i class="ti ti-layout-dashboard"></i><span>Visão Geral</span></div>
+  <div class="nav-divider"></div>
+  <div class="sector-hdr">Clientes</div>
+  <div class="nav-item" onclick="nav('solicitacoes',this)"><i class="ti ti-user-check"></i><span>Solicitações de Acesso</span><span class="nav-badge">3</span></div>
+  <div class="nav-item" onclick="nav('clientes',this)"><i class="ti ti-users"></i><span>Clientes Ativos</span></div>
+  <div class="nav-item" onclick="nav('permissoes',this)"><i class="ti ti-shield-lock"></i><span>Permissões</span></div>
+  <div class="nav-divider"></div>
+  <div class="sector-hdr">Sistema</div>
+  <div class="nav-item" onclick="nav('logs',this)"><i class="ti ti-list-search"></i><span>Logs de Acesso</span></div>
+  <div class="nav-item" onclick="nav('config',this)"><i class="ti ti-settings"></i><span>Configurações</span></div>
+  <div class="nav-divider"></div>
+  <div class="nav-item" onclick="window.location.href='login_cliente.html'"><i class="ti ti-logout"></i><span>Sair</span></div>
+  <div class="sidebar-footer">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">AD</div>
+      <div><div style="font-size:12px;font-weight:600;color:#fff">Admin Principal</div><div style="font-size:9px;padding:1px 6px;border-radius:8px;background:rgba(232,82,26,.25);color:var(--brand);font-weight:600;display:inline-flex;margin-top:2px">Super Admin</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="page-title" id="pg-title">Visão Geral</div>
+    <span class="admin-badge"><i class="ti ti-shield" style="font-size:11px"></i> Painel Admin — Acesso restrito</span>
+  </div>
+  <div class="content">
+
+    <!-- DASHBOARD ADMIN -->
+    <div class="page active" id="p-dashboard">
+      <div class="g4">
+        <div class="kpi kpi-accent"><div class="kpi-label"><i class="ti ti-users" style="color:var(--brand)"></i>Clientes ativos</div><div class="kpi-value">12</div><div class="kpi-badge bp">↑ 2 este mês</div></div>
+        <div class="kpi"><div class="kpi-label"><i class="ti ti-user-check" style="color:var(--warn)"></i>Aguardando aprovação</div><div class="kpi-value">3</div><div class="kpi-badge ba">Ação necessária</div></div>
+        <div class="kpi"><div class="kpi-label"><i class="ti ti-user-off" style="color:var(--danger)"></i>Acessos suspensos</div><div class="kpi-value">1</div><div class="kpi-badge br">Revisão</div></div>
+        <div class="kpi"><div class="kpi-label"><i class="ti ti-eye" style="color:var(--info)"></i>Logins hoje</div><div class="kpi-value">8</div><div class="kpi-badge bb">Últimas 24h</div></div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="ti ti-user-check"></i>Solicitações pendentes</div><button class="btn btn-sm btn-primary" onclick="nav('solicitacoes',null)">Ver todas</button></div>
+          <div class="sol-card">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between">
+              <div><div class="strong">Mariana Oliveira</div><div style="font-size:11px;color:var(--text3)">mariana@loja.com · Loja Bella Moda · há 2h</div></div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-sm btn-success" onclick="aprovar(this)"><i class="ti ti-check"></i>Aprovar</button>
+                <button class="btn btn-sm btn-danger" onclick="rejeitar(this)"><i class="ti ti-x"></i>Rejeitar</button>
+              </div>
+            </div>
+          </div>
+          <div class="sol-card">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between">
+              <div><div class="strong">Carlos Souza</div><div style="font-size:11px;color:var(--text3)">carlos@ecom.com · CS Importados · há 5h</div></div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-sm btn-success" onclick="aprovar(this)"><i class="ti ti-check"></i>Aprovar</button>
+                <button class="btn btn-sm btn-danger" onclick="rejeitar(this)"><i class="ti ti-x"></i>Rejeitar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="ti ti-list-search"></i>Atividade recente</div></div>
+          <div class="act-item"><div class="act-dot" style="background:var(--success)"></div><div class="act-text"><b>Ana Ferreira</b> fez login</div><div class="act-time">5min</div></div>
+          <div class="act-item"><div class="act-dot" style="background:var(--brand)"></div><div class="act-text"><b>João Lopes</b> acessou Relatórios</div><div class="act-time">22min</div></div>
+          <div class="act-item"><div class="act-dot" style="background:var(--warn)"></div><div class="act-text"><b>Admin</b> aprovou acesso de Paula Ramos</div><div class="act-time">1h</div></div>
+          <div class="act-item"><div class="act-dot" style="background:var(--danger)"></div><div class="act-text"><b>Tentativa de login</b> falhou — lucas@xyz.com</div><div class="act-time">3h</div></div>
+          <div class="act-item"><div class="act-dot" style="background:var(--info)"></div><div class="act-text"><b>Beatriz Costa</b> atualizou dados da loja</div><div class="act-time">4h</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOLICITAÇÕES -->
+    <div class="page" id="p-solicitacoes">
+      <div class="filters">
+        <select class="fc" style="width:auto"><option>Todas</option><option>Pendentes</option><option>Aprovadas</option><option>Rejeitadas</option></select>
+        <input class="fc" placeholder="Buscar nome ou e-mail..." style="width:200px"/>
+      </div>
+      <div class="sol-card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+          <div><div class="strong">Mariana Oliveira</div><div style="font-size:11px;color:var(--text3);margin-top:2px">mariana@loja.com · Loja Bella Moda · CNPJ: 12.345.678/0001-00</div><div style="margin-top:6px"><span class="pill pill-a">⏳ Pendente</span></div></div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            <button class="btn btn-sm" onclick="openM('m-ver-solicitacao')"><i class="ti ti-eye"></i>Detalhes</button>
+            <button class="btn btn-sm btn-success" onclick="aprovar(this)"><i class="ti ti-check"></i>Aprovar</button>
+            <button class="btn btn-sm btn-danger" onclick="rejeitar(this)"><i class="ti ti-x"></i>Rejeitar</button>
+          </div>
+        </div>
+      </div>
+      <div class="sol-card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+          <div><div class="strong">Carlos Souza</div><div style="font-size:11px;color:var(--text3);margin-top:2px">carlos@ecom.com · CS Importados · CNPJ: 98.765.432/0001-11</div><div style="margin-top:6px"><span class="pill pill-a">⏳ Pendente</span></div></div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            <button class="btn btn-sm" onclick="openM('m-ver-solicitacao')"><i class="ti ti-eye"></i>Detalhes</button>
+            <button class="btn btn-sm btn-success" onclick="aprovar(this)"><i class="ti ti-check"></i>Aprovar</button>
+            <button class="btn btn-sm btn-danger" onclick="rejeitar(this)"><i class="ti ti-x"></i>Rejeitar</button>
+          </div>
+        </div>
+      </div>
+      <div class="sol-card aprovado">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+          <div><div class="strong">Paula Ramos</div><div style="font-size:11px;color:var(--text3);margin-top:2px">paula@modas.com · Paula Modas · CNPJ: 55.111.000/0001-22</div><div style="margin-top:6px"><span class="pill pill-g">✅ Aprovado · há 1h</span></div></div>
+          <button class="btn btn-sm btn-danger"><i class="ti ti-user-off"></i>Suspender</button>
+        </div>
+      </div>
+      <div class="sol-card rejeitado">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+          <div><div class="strong">Roberto Fake</div><div style="font-size:11px;color:var(--text3);margin-top:2px">fake@xxx.com · Sem CNPJ</div><div style="margin-top:6px"><span class="pill pill-r">❌ Rejeitado · há 2 dias</span></div></div>
+          <button class="btn btn-sm btn-ghost"><i class="ti ti-eye"></i>Ver motivo</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENTES ATIVOS -->
+    <div class="page" id="p-clientes">
+      <div class="filters">
+        <select class="fc" style="width:auto"><option>Todos os status</option><option>Ativo</option><option>Suspenso</option></select>
+        <input class="fc" placeholder="Buscar cliente ou loja..." style="width:200px"/>
+        <button class="btn btn-sm btn-primary" style="margin-left:auto" onclick="openM('m-add-cliente')"><i class="ti ti-plus"></i>Adicionar cliente</button>
+      </div>
+      <div class="card card-0">
+        <table class="tbl">
+          <thead><tr><th>Cliente</th><th>E-mail</th><th>Loja</th><th>CNPJ</th><th>Desde</th><th>Último acesso</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="client-av" style="width:28px;height:28px;font-size:10px;flex-shrink:0">AF</div><span class="strong">Ana Ferreira</span></div></td>
+              <td>ana@bella.com</td><td>Bella Moda</td><td style="font-family:var(--mono);font-size:10px">12.345.678/0001-00</td>
+              <td>03/01/2025</td><td>Hoje · 09:12</td>
+              <td><span class="pill pill-g">Ativo</span></td>
+              <td style="display:flex;gap:4px">
+                <button class="btn btn-sm btn-ghost" onclick="openM('m-editar-cliente')"><i class="ti ti-pencil"></i></button>
+                <button class="btn btn-sm btn-ghost" onclick="openM('m-permissoes-cliente')"><i class="ti ti-shield-lock"></i></button>
+                <button class="btn btn-sm btn-danger" onclick="confirmarSuspensao(this)"><i class="ti ti-user-off"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="client-av" style="width:28px;height:28px;font-size:10px;background:#185fa5;flex-shrink:0">JL</div><span class="strong">João Lopes</span></div></td>
+              <td>joao@csimport.com</td><td>CS Importados</td><td style="font-family:var(--mono);font-size:10px">98.765.432/0001-11</td>
+              <td>15/02/2025</td><td>Hoje · 08:45</td>
+              <td><span class="pill pill-g">Ativo</span></td>
+              <td style="display:flex;gap:4px">
+                <button class="btn btn-sm btn-ghost" onclick="openM('m-editar-cliente')"><i class="ti ti-pencil"></i></button>
+                <button class="btn btn-sm btn-ghost" onclick="openM('m-permissoes-cliente')"><i class="ti ti-shield-lock"></i></button>
+                <button class="btn btn-sm btn-danger" onclick="confirmarSuspensao(this)"><i class="ti ti-user-off"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="client-av" style="width:28px;height:28px;font-size:10px;background:#8a5a00;flex-shrink:0">BC</div><span class="strong">Beatriz Costa</span></div></td>
+              <td>beatriz@bzcorp.com</td><td>BZ Store</td><td style="font-family:var(--mono);font-size:10px">55.111.000/0001-22</td>
+              <td>20/03/2025</td><td>Ontem · 16:30</td>
+              <td><span class="pill pill-r">Suspenso</span></td>
+              <td style="display:flex;gap:4px">
+                <button class="btn btn-sm btn-ghost" onclick="openM('m-editar-cliente')"><i class="ti ti-pencil"></i></button>
+                <button class="btn btn-sm btn-success"><i class="ti ti-user-check"></i>Reativar</button>
+                <button class="btn btn-sm btn-danger" onclick="confirmarExclusao(this)"><i class="ti ti-trash"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PERMISSÕES -->
+    <div class="page" id="p-permissoes">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:14px;background:var(--info-bg);border:1px solid #a8c8f0;padding:10px 14px;border-radius:8px;line-height:1.6">
+        <i class="ti ti-info-circle" style="color:var(--info)"></i> Cada cliente vê <b>apenas os dados da própria loja</b>. Aqui você controla quais módulos cada cliente pode acessar.
+      </div>
+      <div class="client-card">
+        <div class="client-av">AF</div>
+        <div class="client-info"><div class="client-name">Ana Ferreira — Bella Moda</div><div class="client-meta">ana@bella.com</div></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:11px">
+          <div class="perm-tog"><button class="tog on" onclick="toggleBtn(this)"></button>Dashboard</div>
+          <div class="perm-tog"><button class="tog on" onclick="toggleBtn(this)"></button>Pedidos</div>
+          <div class="perm-tog"><button class="tog on" onclick="toggleBtn(this)"></button>Estoque</div>
+          <div class="perm-tog"><button class="tog on" onclick="toggleBtn(this)"></button>Financeiro</div>
+          <div class="perm-tog"><button class="tog" onclick="toggleBtn(this)"></button>Relatórios</div>
+          <div class="perm-tog"><button class="tog on" onclick="toggleBtn(this)"></button>SAC</div>
+        </div>
+      </div>
+      <div class="client-card">
+        <div class="client-av" style="background:#185fa5">JL</div>
+        <div class="client-info"><div class="client-name">João Lopes — CS Importados</div><div class="client-meta">joao@csimport.com</div></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:11px">
+          <div class="perm-tog"><button class="tog on" onclick="toggleBtn(this)"></button>Dashboard</div>
+          <div class="perm-tog"><button class="tog on" onclick="toggleBtn(this)"></button>Pedidos</div>
+          <div class="perm-tog"><button class="tog" onclick="toggleBtn(this)"></button>Estoque</div>
+          <div class="perm-tog"><button class="tog" onclick="toggleBtn(this)"></button>Financeiro</div>
+          <div class="perm-tog"><button class="tog" onclick="toggleBtn(this)"></button>Relatórios</div>
+          <div class="perm-tog"><button class="tog on" onclick="toggleBtn(this)"></button>SAC</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGS -->
+    <div class="page" id="p-logs">
+      <div class="filters">
+        <select class="fc" style="width:auto"><option>Todos os tipos</option><option>Login</option><option>Acesso a módulo</option><option>Falha de login</option><option>Alteração de dados</option></select>
+        <select class="fc" style="width:auto"><option>Todos os clientes</option><option>Ana Ferreira</option><option>João Lopes</option></select>
+        <input class="fc" type="date" style="width:auto"/>
+        <button class="btn btn-sm" style="margin-left:auto"><i class="ti ti-download"></i>Exportar</button>
+      </div>
+      <div class="card card-0">
+        <table class="tbl">
+          <thead><tr><th>Data/Hora</th><th>Cliente</th><th>Ação</th><th>Módulo</th><th>IP</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>15/05 · 09:12</td><td>Ana Ferreira</td><td>Login</td><td>—</td><td>187.23.xxx.xxx</td><td><span class="pill pill-g">Sucesso</span></td></tr>
+            <tr><td>15/05 · 09:14</td><td>Ana Ferreira</td><td>Acesso</td><td>Dashboard</td><td>187.23.xxx.xxx</td><td><span class="pill pill-b">OK</span></td></tr>
+            <tr><td>15/05 · 08:45</td><td>João Lopes</td><td>Login</td><td>—</td><td>201.15.xxx.xxx</td><td><span class="pill pill-g">Sucesso</span></td></tr>
+            <tr><td>15/05 · 06:30</td><td>lucas@xyz.com</td><td>Tentativa de login</td><td>—</td><td>45.88.xxx.xxx</td><td><span class="pill pill-r">Falha</span></td></tr>
+            <tr><td>14/05 · 16:30</td><td>Beatriz Costa</td><td>Login</td><td>—</td><td>189.40.xxx.xxx</td><td><span class="pill pill-g">Sucesso</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CONFIG -->
+    <div class="page" id="p-config">
+      <div class="g2">
+        <div class="card"><div class="card-title" style="margin-bottom:12px"><i class="ti ti-lock"></i>Segurança do sistema</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Aprovação manual de novos clientes</span><button class="tog on" onclick="toggleBtn(this)"></button></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Notificação de novas solicitações</span><button class="tog on" onclick="toggleBtn(this)"></button></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Log de todos os acessos</span><button class="tog on" onclick="toggleBtn(this)"></button></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Bloqueio após 5 tentativas</span><button class="tog on" onclick="toggleBtn(this)"></button></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Sessão expira em (min)</span><select class="fc" style="width:100px;padding:4px 8px"><option>30</option><option>60</option><option>120</option></select></div>
+          </div>
+        </div>
+        <div class="card"><div class="card-title" style="margin-bottom:12px"><i class="ti ti-mail"></i>Notificações admin</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Nova solicitação de acesso</span><button class="tog on" onclick="toggleBtn(this)"></button></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Falha de login (3x)</span><button class="tog on" onclick="toggleBtn(this)"></button></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><span>Cliente inativo há 30 dias</span><button class="tog" onclick="toggleBtn(this)"></button></div>
+            <div class="form-group" style="margin-top:6px"><label>E-mail do admin</label><input class="fc" value="admin@commercehub.com.br"/></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- MODAIS -->
+<div class="modal-overlay" id="m-ver-solicitacao">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title"><i class="ti ti-user-check" style="color:var(--brand)"></i>Solicitação de Acesso</div><button class="modal-close" onclick="closeM('m-ver-solicitacao')"><i class="ti ti-x"></i></button></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;margin-bottom:14px">
+      <div><b>Nome:</b> Mariana Oliveira</div><div><b>E-mail:</b> mariana@loja.com</div>
+      <div><b>Loja:</b> Bella Moda</div><div><b>CNPJ:</b> 12.345.678/0001-00</div>
+      <div><b>Solicitado em:</b> 15/05 · 07:30</div><div><b>Status:</b> <span class="pill pill-a">Pendente</span></div>
+    </div>
+    <div class="form-group" style="margin-bottom:12px"><label>Observação (opcional — enviada ao cliente)</label><textarea class="fc" placeholder="Ex: Acesso aprovado com módulo financeiro restrito."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" onclick="closeM('m-ver-solicitacao')"><i class="ti ti-x"></i>Rejeitar</button>
+      <button class="btn btn-success" onclick="closeM('m-ver-solicitacao')"><i class="ti ti-check"></i>Aprovar e notificar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-add-cliente">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title"><i class="ti ti-user-plus" style="color:var(--brand)"></i>Adicionar Cliente Manualmente</div><button class="modal-close" onclick="closeM('m-add-cliente')"><i class="ti ti-x"></i></button></div>
+    <div class="form-grid">
+      <div class="form-group"><label>Nome completo</label><input class="fc" placeholder="Nome do cliente"/></div>
+      <div class="form-group"><label>E-mail de acesso</label><input class="fc" type="email" placeholder="email@loja.com"/></div>
+      <div class="form-group"><label>Nome da loja</label><input class="fc" placeholder="Nome da loja"/></div>
+      <div class="form-group"><label>CNPJ / CPF</label><input class="fc" placeholder="00.000.000/0001-00"/></div>
+      <div class="form-group"><label>Senha provisória</label><input class="fc" type="password" placeholder="Será enviada por e-mail"/></div>
+      <div class="form-group"><label>Status inicial</label><select class="fc"><option>Ativo</option><option>Suspenso</option></select></div>
+      <div class="form-section fg-full">Permissões iniciais</div>
+      <div class="fg-full" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:11px">
+        <label style="display:flex;align-items:center;gap:5px"><input type="checkbox" checked/> Dashboard</label>
+        <label style="display:flex;align-items:center;gap:5px"><input type="checkbox" checked/> Pedidos</label>
+        <label style="display:flex;align-items:center;gap:5px"><input type="checkbox" checked/> Estoque</label>
+        <label style="display:flex;align-items:center;gap:5px"><input type="checkbox"/> Financeiro</label>
+        <label style="display:flex;align-items:center;gap:5px"><input type="checkbox"/> Relatórios</label>
+        <label style="display:flex;align-items:center;gap:5px"><input type="checkbox" checked/> SAC</label>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn" onclick="closeM('m-add-cliente')">Cancelar</button><button class="btn btn-primary"><i class="ti ti-user-plus"></i>Adicionar e enviar convite</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-editar-cliente">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title"><i class="ti ti-pencil" style="color:var(--brand)"></i>Editar Cliente — Ana Ferreira</div><button class="modal-close" onclick="closeM('m-editar-cliente')"><i class="ti ti-x"></i></button></div>
+    <div class="form-grid">
+      <div class="form-group"><label>Nome completo</label><input class="fc" value="Ana Ferreira"/></div>
+      <div class="form-group"><label>E-mail</label><input class="fc" value="ana@bella.com"/></div>
+      <div class="form-group"><label>Nome da loja</label><input class="fc" value="Bella Moda"/></div>
+      <div class="form-group"><label>CNPJ</label><input class="fc" value="12.345.678/0001-00"/></div>
+      <div class="form-group"><label>Status</label><select class="fc"><option>Ativo</option><option>Suspenso</option></select></div>
+      <div class="form-group"><label>Redefinir senha</label><input class="fc" type="password" placeholder="Deixe em branco para manter"/></div>
+    </div>
+    <div style="margin-top:12px;padding:10px 12px;background:var(--danger-bg);border-radius:8px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:12px;color:var(--danger)"><i class="ti ti-trash"></i> Excluir cliente permanentemente</span>
+      <button class="btn btn-sm btn-danger" onclick="confirmarExclusao(this)">Excluir</button>
+    </div>
+    <div class="modal-footer"><button class="btn" onclick="closeM('m-editar-cliente')">Cancelar</button><button class="btn btn-primary"><i class="ti ti-check"></i>Salvar alterações</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-permissoes-cliente">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title"><i class="ti ti-shield-lock" style="color:var(--brand)"></i>Permissões — Ana Ferreira</div><button class="modal-close" onclick="closeM('m-permissoes-cliente')"><i class="ti ti-x"></i></button></div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:14px">Este cliente vê apenas os dados da própria loja. Aqui você define quais módulos ele pode acessar.</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--success-bg);border-radius:8px;font-size:12px"><span>Dashboard</span><button class="tog on" onclick="toggleBtn(this)"></button></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--success-bg);border-radius:8px;font-size:12px"><span>Pedidos</span><button class="tog on" onclick="toggleBtn(this)"></button></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--success-bg);border-radius:8px;font-size:12px"><span>Estoque</span><button class="tog on" onclick="toggleBtn(this)"></button></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--success-bg);border-radius:8px;font-size:12px"><span>Financeiro</span><button class="tog on" onclick="toggleBtn(this)"></button></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface2);border-radius:8px;font-size:12px"><span>Relatórios completos</span><button class="tog" onclick="toggleBtn(this)"></button></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--success-bg);border-radius:8px;font-size:12px"><span>SAC</span><button class="tog on" onclick="toggleBtn(this)"></button></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface2);border-radius:8px;font-size:12px"><span>Concorrentes</span><button class="tog" onclick="toggleBtn(this)"></button></div>
+    </div>
+    <div class="modal-footer"><button class="btn" onclick="closeM('m-permissoes-cliente')">Cancelar</button><button class="btn btn-primary"><i class="ti ti-check"></i>Salvar permissões</button></div>
+  </div>
+</div>
+
+<script>
+const pageTitles={dashboard:'Visão Geral',solicitacoes:'Solicitações de Acesso',clientes:'Clientes Ativos',permissoes:'Permissões por Cliente',logs:'Logs de Acesso',config:'Configurações'};
+function nav(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg=document.getElementById('p-'+id);if(pg)pg.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el){el.classList.add('active');}else{document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'"))n.classList.add('active');});}
+  document.getElementById('pg-title').textContent=pageTitles[id]||id;
+}
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
+function toggleBtn(el){el.classList.toggle('on');}
+function toast(msg,color){
+  const d=document.createElement('div');
+  d.style.cssText=`position:fixed;bottom:24px;right:24px;background:${color};color:#fff;padding:12px 18px;border-radius:10px;font-size:12px;font-weight:500;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.2);display:flex;align-items:center;gap:8px`;
+  d.innerHTML=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),3000);
+}
+function aprovar(btn){
+  const card=btn.closest('.sol-card');
+  card.style.borderLeftColor='var(--success)';
+  card.querySelector('.pill')&&(card.querySelector('.pill').className='pill pill-g',card.querySelector('.pill').textContent='✅ Aprovado');
+  btn.closest('div').querySelectorAll('.btn-success,.btn-danger').forEach(b=>b.remove());
+  toast('<i class="ti ti-check" style="font-size:15px"></i> Cliente aprovado e notificado por e-mail','#2d7a1f');
+}
+function rejeitar(btn){
+  const card=btn.closest('.sol-card');
+  card.style.borderLeftColor='var(--danger)';
+  btn.closest('div').querySelectorAll('.btn-success,.btn-danger').forEach(b=>b.remove());
+  toast('<i class="ti ti-x" style="font-size:15px"></i> Solicitação rejeitada','#c0392b');
+}
+function confirmarSuspensao(btn){if(confirm('Suspender acesso deste cliente?')){toast('<i class="ti ti-user-off" style="font-size:15px"></i> Acesso suspenso','#8a5a00');}}
+function confirmarExclusao(btn){if(confirm('Excluir cliente permanentemente? Esta ação não pode ser desfeita.')){closeM('m-editar-cliente');toast('<i class="ti ti-trash" style="font-size:15px"></i> Cliente excluído','#c0392b');}}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/dashboard.js"></script>
+
+</body>
+</html>
